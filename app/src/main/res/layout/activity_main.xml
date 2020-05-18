@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ScrollView
+        android:layout_centerVertical="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp">
+
+            <EditText
+                android:id="@+id/user_text"
+                android:layout_width="match_parent"
+                android:background="@drawable/login_edit_background"
+                android:hint="Username"
+                android:padding="10dp"
+                android:layout_height="wrap_content">
+            </EditText>
+
+            <EditText
+                android:id="@+id/password_text"
+                android:layout_width="match_parent"
+                android:hint="Password"
+                android:padding="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/login_edit_background"
+                android:inputType="textPassword"
+                android:layout_height="wrap_content">
+            </EditText>
+
+            <Button
+                android:id="@+id/login_btn"
+                android:layout_width="match_parent"
+                android:text="Sign in"
+                android:background="@drawable/login_btn_background"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:textAllCaps="false"
+                android:textSize="20sp">
+            </Button>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:text="Sign Up"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textAllCaps="false"
+                android:layout_marginTop="30dp"
+                android:textSize="20sp">
+            </TextView>
+
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>
