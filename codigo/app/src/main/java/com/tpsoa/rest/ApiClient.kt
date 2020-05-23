@@ -14,7 +14,7 @@ object ApiConstants {
     const val CONTENT_TYPE_HEADER = "Content-Type:application/json"
 }
 
-data class SignResponse(
+data class SignInResponse(
     val state: String,
     val msg: String,
     val token: String
@@ -30,11 +30,11 @@ data class SignUpResponse(
 interface ApiInterface {
     @Headers(ApiConstants.CONTENT_TYPE_HEADER)
     @POST("login")
-    fun SignIn(@Body info: SignInRequest): Call<SignResponse>
+    fun SignIn(@Body info: SignInRequest): Call<SignInResponse>
 
     @Headers(ApiConstants.CONTENT_TYPE_HEADER)
     @POST("register")
-    fun Register(@Body info: SignUpRequest): Call<SignUpResponse>
+    fun SignUp(@Body info: SignUpRequest): Call<SignUpResponse>
 }
 
 object ServiceBuilder {

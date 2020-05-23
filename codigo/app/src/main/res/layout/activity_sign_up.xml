@@ -98,6 +98,8 @@
                 android:id="@+id/registration_btn"
                 android:layout_width="match_parent"
                 android:text="Sign up"
+                android:onClick="onClick"
+                android:enabled="false"
                 android:background="@drawable/login_btn_background"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"

@@ -20,6 +20,7 @@
 
             <EditText
                 android:id="@+id/user_text"
+                android:focusedByDefault="true"
                 android:layout_width="match_parent"
                 android:background="@drawable/login_edit_background"
                 android:hint="Email"
@@ -42,6 +43,8 @@
                 android:id="@+id/login_btn"
                 android:layout_width="match_parent"
                 android:text="Sign in"
+                android:enabled="false"
+                android:onClick="onLoginClick"
                 android:background="@drawable/login_btn_background"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
@@ -55,6 +58,7 @@
                 android:text="Sign Up"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:onClick="onSignUpClick"
                 android:textAllCaps="false"
                 android:layout_marginTop="30dp"
                 android:textSize="20sp">
@@ -63,10 +67,5 @@
         </LinearLayout>
 
     </ScrollView>
-
-    <include
-        android:id="@+id/sign_up_layout"
-        layout="@layout/sign_up"
-        android:visibility="gone"></include>
 
 </RelativeLayout>

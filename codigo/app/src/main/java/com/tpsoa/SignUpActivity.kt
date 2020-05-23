@@ -1,18 +1,18 @@
 package com.tpsoa
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import com.tpsoa.model.SignInRequest
+import androidx.core.text.isDigitsOnly
 import com.tpsoa.model.SignUpRequest
 import com.tpsoa.rest.ApiInterface
 import com.tpsoa.rest.ServiceBuilder
-import com.tpsoa.rest.SignResponse
+import com.tpsoa.rest.SignInResponse
 import com.tpsoa.rest.SignUpResponse
-import kotlinx.android.synthetic.main.login.*
-import kotlinx.android.synthetic.main.login.password_text
-import kotlinx.android.synthetic.main.sign_up.*
+import kotlinx.android.synthetic.main.activity_login.password_text
+import kotlinx.android.synthetic.main.activity_sign_up.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -21,18 +21,79 @@ class SignUpActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.sign_up)
+        setContentView(R.layout.activity_sign_up)
 
-        registration_btn.setOnClickListener{
-            Toast.makeText(applicationContext, "asdqwe", Toast.LENGTH_SHORT).show()
+        name_text.setOnFocusChangeListener{ _, hasFocus ->
+            if (!hasFocus) {
+                registration_btn.isEnabled = checkSignUpButtonState()
+            }
         }
+        lastname_text.setOnFocusChangeListener{ _, hasFocus ->
+            if (!hasFocus) {
+                registration_btn.isEnabled = checkSignUpButtonState()
+            }
+        }
+
+        dni_text.setOnFocusChangeListener{ _, hasFocus ->
+            if (!hasFocus) {
+                registration_btn.isEnabled = checkSignUpButtonState()
+            }
+        }
+
+        group_text.setOnFocusChangeListener{ _, hasFocus ->
+            if (!hasFocus) {
+                registration_btn.isEnabled = checkSignUpButtonState()
+            }
+        }
+
+        commission_text.setOnFocusChangeListener{ _, hasFocus ->
+            if (!hasFocus) {
+                registration_btn.isEnabled = checkSignUpButtonState()
+            }
+        }
+
+        email_text.setOnFocusChangeListener{ _, hasFocus ->
+            if (!hasFocus) {
+                registration_btn.isEnabled = checkSignUpButtonState()
+            }
+        }
+
+        password_text.setOnFocusChangeListener{ _, hasFocus ->
+            if (!hasFocus) {
+                registration_btn.isEnabled = checkSignUpButtonState()
+            }
+        }
+
+        password_confirmation_text.setOnFocusChangeListener{ _, hasFocus ->
+            if (!hasFocus) {
+                registration_btn.isEnabled = checkSignUpButtonState()
+            }
+        }
+
     }
 
-    private fun signUp() {
-        if (!validateRegistration()) {
-            return
-        }
+    private fun checkSignUpButtonState(): Boolean {
+        val name = name_text!!.text.toString()
+        val lastname = lastname_text!!.text.toString()
+        val dni = dni_text!!.text.toString()
+        val group = group_text!!.text.toString()
+        val commission = commission_text!!.text.toString()
+        val email = email_text!!.text.toString()
+        val password = password_text!!.text.toString()
+        val passwordConfirmation = password_text!!.text.toString()
 
+        return name.isNotEmpty() &&
+                lastname.isNotEmpty() &&
+                dni.isDigitsOnly() &&
+                group.isDigitsOnly() &&
+                commission.isDigitsOnly() &&
+                android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+                && password.isNotEmpty()
+                && passwordConfirmation.isNotEmpty()
+                && password == passwordConfirmation
+    }
+
+    fun onClick(v: View) {
         val name = name_text!!.text.toString()
         val lastname = lastname_text!!.text.toString()
         val dni = dni_text!!.text.toString().toInt()
@@ -43,44 +104,33 @@ class SignUpActivity : AppCompatActivity() {
 
         val request = ServiceBuilder.buildService(ApiInterface::class.java)
         val req = SignUpRequest(name, lastname, dni, group, commission, email, password)
-        val call = request.Register(req)
+        // val req = SignUpRequest("Alejandro", "Imperatori", 40011139 , 622, 2900, "aimperatori@alumno.unlam.edu.ar", "40011139")
+        val call = request.SignUp(req)
 
-        call.enqueue(object : Callback<SignUpResponse>{
+        call.enqueue(object : Callback<SignUpResponse> {
             override fun onResponse(call: Call<SignUpResponse>, response: Response<SignUpResponse>) {
+                val res = response.body() as SignUpResponse
                 if (response.isSuccessful){
-                    Toast.makeText(applicationContext, "Sign up successfully", Toast.LENGTH_SHORT).show()
+                    onSignUpSuccess()
                 } else {
-                    Toast.makeText(applicationContext, "Error in params", Toast.LENGTH_SHORT).show()
+                    onSignUpFailed(res.msg)
                 }
             }
             override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
-                Toast.makeText(applicationContext, "${t.message}", Toast.LENGTH_SHORT).show()
+                onSignUpFailed("${t.message}")
             }
         })
 
     }
 
-    private fun validateRegistration(): Boolean {
-        /*var valid = true
+    private fun onSignUpSuccess() {
+        Toast.makeText(this, "Sign up successfully", Toast.LENGTH_SHORT).show()
+        startActivity(Intent(this, LoginActivity::class.java))
+        finish()
+    }
 
-        val email = user_text!!.text.toString()
-        val password = password_text!!.text.toString()
-
-        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            user_text!!.error = "Enter a valid email address"
-            valid = false
-        } else {
-            user_text!!.error = null
-        }
-
-        if (password.isEmpty() || password.length < 8 || password.length > 20) {
-            password_text!!.error = "between 8 and 20 alphanumeric characters"
-            valid = false
-        } else {
-            password_text!!.error = null
-        }
-        */
-        return true
+    private fun onSignUpFailed(message: String) {
+        Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
     }
 
 }
