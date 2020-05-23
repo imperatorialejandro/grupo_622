@@ -9,6 +9,7 @@ import com.tpsoa.model.SignInRequest
 import com.tpsoa.rest.ApiInterface
 import com.tpsoa.rest.ServiceBuilder
 import com.tpsoa.rest.SignInResponse
+import com.tpsoa.sharedpreferences.SharedPreferencesManager
 import kotlinx.android.synthetic.main.activity_login.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -64,6 +65,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun onLoginSuccess() {
         Toast.makeText(this, "Sign in successfully", Toast.LENGTH_SHORT).show()
+        SharedPreferencesManager.setLogged(applicationContext, true)
         startActivity(Intent(this, MainActivity::class.java))
         finish()
     }
