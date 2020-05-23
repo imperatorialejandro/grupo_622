@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".LoginActivity">
 
     <ScrollView
+        android:id="@+id/home_layout"
         android:layout_centerVertical="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -21,7 +22,7 @@
                 android:id="@+id/user_text"
                 android:layout_width="match_parent"
                 android:background="@drawable/login_edit_background"
-                android:hint="Username"
+                android:hint="Email"
                 android:padding="10dp"
                 android:layout_height="wrap_content">
             </EditText>
@@ -49,6 +50,7 @@
             </Button>
 
             <TextView
+                android:id="@+id/sign_up_btn"
                 android:layout_width="wrap_content"
                 android:text="Sign Up"
                 android:layout_height="wrap_content"
@@ -59,6 +61,12 @@
             </TextView>
 
         </LinearLayout>
+
     </ScrollView>
+
+    <include
+        android:id="@+id/sign_up_layout"
+        layout="@layout/sign_up"
+        android:visibility="gone"></include>
 
 </RelativeLayout>
