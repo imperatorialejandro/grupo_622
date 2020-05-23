@@ -80,7 +80,7 @@ class SignUpActivity : AppCompatActivity() {
         val commission = commission_text!!.text.toString()
         val email = email_text!!.text.toString()
         val password = password_text!!.text.toString()
-        val passwordConfirmation = password_text!!.text.toString()
+        val passwordConfirmation = password_confirmation_text!!.text.toString()
 
         return name.isNotEmpty() &&
                 lastname.isNotEmpty() &&
@@ -104,7 +104,6 @@ class SignUpActivity : AppCompatActivity() {
 
         val request = ServiceBuilder.buildService(ApiInterface::class.java)
         val req = SignUpRequest(name, lastname, dni, group, commission, email, password)
-        // val req = SignUpRequest("Alejandro", "Imperatori", 40011139 , 622, 2900, "aimperatori@alumno.unlam.edu.ar", "40011139")
         val call = request.SignUp(req)
 
         call.enqueue(object : Callback<SignUpResponse> {
