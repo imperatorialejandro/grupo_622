@@ -22,7 +22,6 @@ data class SignInResponse(
 
 data class SignUpResponse(
     val state: String,
-    val env: String,
     val token: String,
     val msg: String
 )

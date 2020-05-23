@@ -42,6 +42,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun onLoginClick(v: View) {
+        login_btn.isEnabled = false
+
         val email = user_text!!.text.toString()
         val password = password_text!!.text.toString()
 
@@ -51,12 +53,13 @@ class LoginActivity : AppCompatActivity() {
 
         call.enqueue(object : Callback<SignInResponse>{
             override fun onResponse(call: Call<SignInResponse>, response: Response<SignInResponse>) {
-                val res = response.body() as SignInResponse
                 if (response.isSuccessful){
+                    val res = response.body() as SignInResponse
                     onLoginSuccess(res.token)
                 } else {
                     onLoginFailed()
                 }
+                login_btn.isEnabled = true
             }
             override fun onFailure(call: Call<SignInResponse>, t: Throwable) {
                 onLoginFailed("${t.message}")
@@ -72,7 +75,7 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun onLoginFailed(message: String = "Email or password incorrect ") {
+    private fun onLoginFailed(message: String = "Incorrect email or password") {
         Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
     }
 
