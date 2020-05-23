@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkLogged() {
-        if (!gSharedPreferencesManager.isLogged(applicationContext)) {
+        if (!SharedPreferencesManager.isLogged(applicationContext)) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
