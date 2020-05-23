@@ -51,8 +51,9 @@ class LoginActivity : AppCompatActivity() {
 
         call.enqueue(object : Callback<SignInResponse>{
             override fun onResponse(call: Call<SignInResponse>, response: Response<SignInResponse>) {
+                val res = response.body() as SignInResponse
                 if (response.isSuccessful){
-                    onLoginSuccess()
+                    onLoginSuccess(res.token)
                 } else {
                     onLoginFailed()
                 }
@@ -63,9 +64,10 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
-    private fun onLoginSuccess() {
+    private fun onLoginSuccess(token: String) {
         Toast.makeText(this, "Sign in successfully", Toast.LENGTH_SHORT).show()
         SharedPreferencesManager.setLogged(applicationContext, true)
+        SharedPreferencesManager.setToken(applicationContext, token)
         startActivity(Intent(this, MainActivity::class.java))
         finish()
     }
