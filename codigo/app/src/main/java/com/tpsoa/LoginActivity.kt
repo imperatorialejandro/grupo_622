@@ -16,7 +16,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +39,7 @@ class LoginActivity : AppCompatActivity() {
 
     fun onSignUpClick(v: View) {
         startActivity(Intent(this, SignUpActivity::class.java))
+        finish()
     }
 
     fun onLoginClick(v: View) {

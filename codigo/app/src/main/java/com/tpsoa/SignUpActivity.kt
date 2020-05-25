@@ -17,7 +17,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class SignUpActivity : AppCompatActivity() {
+class SignUpActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -176,7 +176,7 @@ class SignUpActivity : AppCompatActivity() {
                 && password == passwordConfirmation
     }
 
-    fun onClick(v: View) {
+    fun onRegistrationClick(v: View) {
         registration_btn.isEnabled = false
 
         val name = name_text!!.text.toString()
@@ -206,6 +206,11 @@ class SignUpActivity : AppCompatActivity() {
             }
         })
 
+    }
+
+    fun onLoginClick(v: View) {
+        startActivity(Intent(this, LoginActivity::class.java))
+        finish()
     }
 
     private fun onSignUpSuccess() {
