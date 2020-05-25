@@ -7,7 +7,7 @@ import android.content.SharedPreferences
 object SharedPreferencesManager {
     private const val APP_SETTINGS = "com.tpsoa.voicerecorder"
 
-    private const val IS_LOGGED = "is_logged"
+    private const val USER_LOGGER = "user_logged"
     private const val TOKEN = "token"
 
     private fun getSharedPreferences(context: Context): SharedPreferences {
@@ -29,19 +29,19 @@ object SharedPreferencesManager {
         editor.commit()
     }
 
-    fun isLogged(context: Context): Boolean {
+    fun getUserLogged(context: Context): String? {
         return getSharedPreferences(context)
-            .getBoolean(IS_LOGGED, false)
+            .getString(USER_LOGGER, "")
     }
 
-    fun setLogged(context: Context, newValue: Boolean) {
+    fun setUserLogged(context: Context, newValue: String) {
         val editor =
             getSharedPreferences(context).edit()
-        editor.putBoolean(IS_LOGGED, newValue)
+        editor.putString(USER_LOGGER, newValue)
         editor.commit()
     }
 
-    fun clear(context: Context) {
+    fun clearPrefs(context: Context) {
         var editor = getSharedPreferences(context).edit()
         editor.clear()
         editor.apply()

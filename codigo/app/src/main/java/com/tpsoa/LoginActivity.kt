@@ -6,7 +6,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.tpsoa.model.SignInRequest
 import com.tpsoa.rest.ApiInterface
 import com.tpsoa.rest.ServiceBuilder
@@ -72,7 +71,7 @@ class LoginActivity : BaseActivity() {
             override fun onResponse(call: Call<SignInResponse>, response: Response<SignInResponse>) {
                 if (response.isSuccessful){
                     val res = response.body() as SignInResponse
-                    onLoginSuccess(res.token)
+                    onLoginSuccess(req, res.token)
                 } else {
                     onLoginFailed()
                 }
@@ -84,12 +83,16 @@ class LoginActivity : BaseActivity() {
         })
     }
 
-    private fun onLoginSuccess(token: String) {
+    private fun onLoginSuccess(req: SignInRequest,token: String) {
         Toast.makeText(this, "Sign in successfully", Toast.LENGTH_SHORT).show()
-        SharedPreferencesManager.setLogged(applicationContext, true)
+        SharedPreferencesManager.setUserLogged(applicationContext, getUsernameFromEmail(req.email))
         SharedPreferencesManager.setToken(applicationContext, token)
         startActivity(Intent(this, MainActivity::class.java))
         finish()
+    }
+
+    private fun getUsernameFromEmail(email: String): String {
+        return email.split("@").toTypedArray()[0]
     }
 
     private fun onLoginFailed(message: String = "Incorrect email or password") {
