@@ -2,6 +2,8 @@ package com.tpsoa
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -25,15 +27,29 @@ class LoginActivity : BaseActivity() {
         user_text.setOnFocusChangeListener{ _, hasFocus ->
             if (!hasFocus) {
                 validateEmail()
-                login_btn.isEnabled = checkLoginButtonState()
             }
         }
+
+        user_text.addTextChangedListener(addTextWatcherButtonState())
 
         password_text.setOnFocusChangeListener{ _, hasFocus ->
             if (!hasFocus) {
                 validatePassword()
+            }
+        }
+
+        password_text.addTextChangedListener(addTextWatcherButtonState())
+    }
+
+    private fun addTextWatcherButtonState() :TextWatcher {
+        return object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
                 login_btn.isEnabled = checkLoginButtonState()
             }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
         }
     }
 

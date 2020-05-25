@@ -1,15 +1,15 @@
 package com.tpsoa
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.core.text.isDigitsOnly
 import com.tpsoa.model.SignUpRequest
 import com.tpsoa.rest.ApiInterface
 import com.tpsoa.rest.ServiceBuilder
-import com.tpsoa.rest.SignInResponse
 import com.tpsoa.rest.SignUpResponse
 import kotlinx.android.synthetic.main.activity_login.password_text
 import kotlinx.android.synthetic.main.activity_sign_up.*
@@ -26,56 +26,77 @@ class SignUpActivity : BaseActivity() {
         name_text.setOnFocusChangeListener{ _, hasFocus ->
             if (!hasFocus) {
                 validateName()
-                registration_btn.isEnabled = checkSignUpButtonState()
             }
         }
+
+        name_text.addTextChangedListener(addTextWatcherButtonState())
+
         lastname_text.setOnFocusChangeListener{ _, hasFocus ->
             if (!hasFocus) {
                 validateLastName()
-                registration_btn.isEnabled = checkSignUpButtonState()
             }
         }
+
+        lastname_text.addTextChangedListener(addTextWatcherButtonState())
 
         dni_text.setOnFocusChangeListener{ _, hasFocus ->
             if (!hasFocus) {
                 validateDni()
-                registration_btn.isEnabled = checkSignUpButtonState()
             }
         }
+
+        dni_text.addTextChangedListener(addTextWatcherButtonState())
 
         group_text.setOnFocusChangeListener{ _, hasFocus ->
             if (!hasFocus) {
                 validateGroup()
-                registration_btn.isEnabled = checkSignUpButtonState()
             }
         }
+
+        group_text.addTextChangedListener(addTextWatcherButtonState())
 
         commission_text.setOnFocusChangeListener{ _, hasFocus ->
             if (!hasFocus) {
                 validateCommission()
-                registration_btn.isEnabled = checkSignUpButtonState()
             }
         }
+
+        commission_text.addTextChangedListener(addTextWatcherButtonState())
 
         email_text.setOnFocusChangeListener{ _, hasFocus ->
             if (!hasFocus) {
                 validateEmail()
-                registration_btn.isEnabled = checkSignUpButtonState()
             }
         }
+
+        email_text.addTextChangedListener(addTextWatcherButtonState())
 
         password_text.setOnFocusChangeListener{ _, hasFocus ->
             if (!hasFocus) {
                 validatePassword()
-                registration_btn.isEnabled = checkSignUpButtonState()
             }
         }
+
+        password_text.addTextChangedListener(addTextWatcherButtonState())
 
         password_confirmation_text.setOnFocusChangeListener{ _, hasFocus ->
             if (!hasFocus) {
                 validatePasswordConfirmation()
+            }
+        }
+
+        password_confirmation_text.addTextChangedListener(addTextWatcherButtonState())
+    }
+
+    private fun addTextWatcherButtonState() : TextWatcher {
+        return object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
                 registration_btn.isEnabled = checkSignUpButtonState()
             }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
         }
     }
 
