@@ -2,9 +2,10 @@ package com.tpsoa
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.tpsoa.model.SignInRequest
 import com.tpsoa.rest.ApiInterface
 import com.tpsoa.rest.ServiceBuilder
@@ -16,7 +17,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,20 +26,35 @@ class LoginActivity : AppCompatActivity() {
         user_text.setOnFocusChangeListener{ _, hasFocus ->
             if (!hasFocus) {
                 validateEmail()
-                login_btn.isEnabled = checkLoginButtonState()
             }
         }
+
+        user_text.addTextChangedListener(addTextWatcherButtonState())
 
         password_text.setOnFocusChangeListener{ _, hasFocus ->
             if (!hasFocus) {
                 validatePassword()
+            }
+        }
+
+        password_text.addTextChangedListener(addTextWatcherButtonState())
+    }
+
+    private fun addTextWatcherButtonState() :TextWatcher {
+        return object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
                 login_btn.isEnabled = checkLoginButtonState()
             }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
         }
     }
 
     fun onSignUpClick(v: View) {
         startActivity(Intent(this, SignUpActivity::class.java))
+        finish()
     }
 
     fun onLoginClick(v: View) {
@@ -55,7 +71,7 @@ class LoginActivity : AppCompatActivity() {
             override fun onResponse(call: Call<SignInResponse>, response: Response<SignInResponse>) {
                 if (response.isSuccessful){
                     val res = response.body() as SignInResponse
-                    onLoginSuccess(res.token)
+                    onLoginSuccess(req, res.token)
                 } else {
                     onLoginFailed()
                 }
@@ -67,12 +83,16 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
-    private fun onLoginSuccess(token: String) {
+    private fun onLoginSuccess(req: SignInRequest,token: String) {
         Toast.makeText(this, "Sign in successfully", Toast.LENGTH_SHORT).show()
-        SharedPreferencesManager.setLogged(applicationContext, true)
+        SharedPreferencesManager.setUserLogged(applicationContext, getUsernameFromEmail(req.email))
         SharedPreferencesManager.setToken(applicationContext, token)
         startActivity(Intent(this, MainActivity::class.java))
         finish()
+    }
+
+    private fun getUsernameFromEmail(email: String): String {
+        return email.split("@").toTypedArray()[0]
     }
 
     private fun onLoginFailed(message: String = "Incorrect email or password") {

@@ -4,99 +4,98 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.tpsoa.sharedpreferences.SharedPreferencesManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.pow
 
-class MainActivity : AppCompatActivity(), SensorEventListener {
+class MainActivity : BaseActivity() {
 
-    private lateinit var sensorManager: SensorManager
-    //private var lightSensor: Sensor? = null
     private var accelerometerSensor : Sensor ?= null
-    //acelerometro
-    val SHAKE_THRESHOLD: Float = 10.25f // How hard should user shake to invoke the service
-    val MIN_TIME_BETWEEN_SHAKES = 1000
+    private val SHAKE_THRESHOLD: Float = 10.25f
+    private val MIN_TIME_BETWEEN_SHAKES = 1000
     private var lastShakeTime: Long = 0
-    //audio recorder
+
     private var mediaRecorder: MediaRecorder? = null
     private var mediaPlayer: MediaPlayer? = null
     private var audioFilePath: String? = null
     private var isRecording = false
-    private val RECORD_REQUEST_CODE = 101
-    private val STORAGE_REQUEST_CODE = 102
 
     private val formatter = SimpleDateFormat("dd-MM-yyyy hhmm")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        checkLogged()
-    }
+        setContentView(R.layout.activity_main)
 
-    private fun init(){
-        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        //lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
-        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        checkLogged()
+
+        accelerometerSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        if (accelerometerSensor == null) {
+            Toast.makeText(this, "Device has no accelerometer sensor", Toast.LENGTH_SHORT).show()
+        }
 
         audioSetup()
     }
 
-    override fun onPause() {
-        super.onPause()
-        sensorManager.unregisterListener(this);
-    }
-
     private fun checkLogged() {
-        if (!SharedPreferencesManager.isLogged(applicationContext)) {
+        if (!isLogged()) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
-        } else {
-            setContentView(R.layout.activity_main)
-            init()
+        }
+        var loggedUser = SharedPreferencesManager.getUserLogged(applicationContext)
+        email_user_text.text = "Hello $loggedUser!"
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.voice_recorder_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.logout_item_menu -> {
+                onLogoutClick()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
-    fun onLogoutClick(view: View) {
-        SharedPreferencesManager.clear(applicationContext)
+    private fun isLogged(): Boolean {
+        return SharedPreferencesManager.getUserLogged(applicationContext) != ""
+    }
+
+    private fun onLogoutClick() {
+        SharedPreferencesManager.clearPrefs(applicationContext)
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-
-    }
-
-    override fun onSensorChanged(event: SensorEvent?) {
+    override fun accelerometerSensorTriggered(event: SensorEvent) {
         val curTime = System.currentTimeMillis()
         if (curTime - lastShakeTime > MIN_TIME_BETWEEN_SHAKES) {
             val x = event!!.values[0]
             val y = event.values[1]
             val z = event.values[2]
             val acceleration = Math.sqrt(
-                Math.pow(x.toDouble(), 2.0) +
-                        Math.pow(y.toDouble(), 2.0) +
-                        Math.pow(z.toDouble(), 2.0)
+                x.toDouble().pow(2.0) +
+                        y.toDouble().pow(2.0) +
+                        z.toDouble().pow(2.0)
             ) - SensorManager.GRAVITY_EARTH
             if (acceleration > SHAKE_THRESHOLD) {
                 lastShakeTime = curTime
-//                if (!isFlashlightOn) {
-//                    torchToggle("on")
-//                    isFlashlightOn = true
-//                } else {
-//                    torchToggle("off")
-//                    isFlashlightOn = false
-//                }
-                Log.i("asd","shake")
                 Log.i("asd","isRecording: "+isRecording)
                 if(isRecording){
                     Log.i("asd","deja de grabar")
@@ -110,13 +109,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        sensorManager.registerListener(this, this.accelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
-        //sensorManager.registerListener(this, this.lightSensor, SensorManager.SENSOR_DELAY_NORMAL,handler);
-
-    }
-
     fun onStopClick(view: View) {
         stop()
     }
@@ -126,7 +118,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         pauseResumeBtn.isEnabled = true
 
         if (isRecording) {
-//            recordBtn.isEnabled = false
             mediaRecorder?.stop()
             mediaRecorder?.release()
             mediaRecorder = null
@@ -143,7 +134,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         record()
     }
 
-    fun record(){
+    private fun record(){
         isRecording = true
         stopBtn.isEnabled = true
         recordBtn.isEnabled = false
@@ -181,24 +172,21 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             stopBtn.isEnabled = false
             pauseResumeBtn.isEnabled = false
         }
-
-//        audioFilePath = Environment.getExternalStorageDirectory().absolutePath + "/voice note.mp3"
-//
-//        Log.i("asd",audioFilePath)
     }
 
     fun onPauseResumeClick(view: View) {
-        if(isRecording)
+        if(isRecording) {
             pauseRecording()
-        else
+        }
+        else {
             resumeRecording()
+        }
     }
 
     private fun resumeRecording() {
         Toast.makeText(this,"Resuming voice note", Toast.LENGTH_SHORT).show()
         mediaRecorder?.resume()
         pauseResumeBtn.text = "Pause"
-//        recordingStopped = false
         isRecording = true
     }
 
