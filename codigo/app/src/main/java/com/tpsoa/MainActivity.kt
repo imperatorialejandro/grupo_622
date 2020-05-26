@@ -1,5 +1,6 @@
 package com.tpsoa
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.Sensor
@@ -14,6 +15,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import com.tpsoa.sharedpreferences.SharedPreferencesManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.text.SimpleDateFormat
@@ -57,6 +59,10 @@ class MainActivity : BaseActivity() {
         email_user_text.text = "Hello $loggedUser!"
     }
 
+    private fun isLogged(): Boolean {
+        return SharedPreferencesManager.getUserLogged(applicationContext) != ""
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.voice_recorder_menu, menu)
@@ -71,10 +77,6 @@ class MainActivity : BaseActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun isLogged(): Boolean {
-        return SharedPreferencesManager.getUserLogged(applicationContext) != ""
     }
 
     private fun onLogoutClick() {
@@ -109,6 +111,16 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        sensorManager?.registerListener(this, this.accelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    override fun onPause() {
+        super.onPause()
+        sensorManager?.unregisterListener(this);
+    }
+
     fun onStopClick(view: View) {
         stop()
     }
@@ -131,7 +143,12 @@ class MainActivity : BaseActivity() {
     }
 
     fun onRecordClick(view: View) {
-        record()
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 10)
+        } else {
+            record()
+        }
     }
 
     private fun record(){

@@ -15,7 +15,6 @@ open class BaseActivity : AppCompatActivity(), SensorEventListener {
     var sensorManager: SensorManager? = null
     private var lightSensor: Sensor? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
