@@ -1,6 +1,9 @@
+*.iml
 .idea/
 .gradle/
 gradle/
 gradlew
 gradlew.bat
 codigo/build/
+codigo/app/app.iml
+codigo/local.properties

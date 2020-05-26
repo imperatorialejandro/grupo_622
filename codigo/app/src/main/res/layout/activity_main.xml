@@ -8,6 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_margin="10dp">
 
         <TextView
@@ -16,6 +17,33 @@
             android:layout_height="wrap_content"
             android:text="Hello!"
             android:textSize="20sp"/>
+
+        <Button
+            android:id="@+id/recordBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableStart="@android:drawable/presence_audio_online"
+            android:onClick="onRecordClick"
+            android:text="@string/record" />
+
+        <Button
+            android:id="@+id/pauseResumeBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableStart="@android:drawable/ic_media_pause"
+            android:onClick="onPauseResumeClick"
+            android:text="@string/pause" />
+
+        <Button
+            android:id="@+id/stopBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@android:drawable/checkbox_off_background"
+            android:onClick="onStopClick"
+            android:text="@string/stop"
+            android:layout_weight="1" />
 
     </LinearLayout>
 

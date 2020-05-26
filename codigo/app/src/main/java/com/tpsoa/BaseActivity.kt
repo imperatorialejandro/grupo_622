@@ -15,7 +15,6 @@ open class BaseActivity : AppCompatActivity(), SensorEventListener {
     var sensorManager: SensorManager? = null
     private var lightSensor: Sensor? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -49,6 +48,10 @@ open class BaseActivity : AppCompatActivity(), SensorEventListener {
             } else if (value > 1000 && mode != AppCompatDelegate.MODE_NIGHT_NO) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
+        } else if (event!!.sensor.type == Sensor.TYPE_ACCELEROMETER) {
+            accelerometerSensorTriggered(event)
         }
     }
+
+    open fun accelerometerSensorTriggered(event: SensorEvent) {}
 }
