@@ -14,10 +14,15 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ListView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import com.tpsoa.model.VoiceNote
 import com.tpsoa.sharedpreferences.SharedPreferencesManager
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.pow
@@ -34,13 +39,38 @@ class MainActivity : BaseActivity() {
     private var audioFilePath: String? = null
     private var isRecording = false
 
-    private val formatter = SimpleDateFormat("dd-MM-yyyy hhmm")
+    private val formatter = SimpleDateFormat("dd-MM-yyyy HHmm")
+
+    private lateinit var listView : ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        listView = findViewById(R.id.listView)
+        var list = mutableListOf<VoiceNote>()
+
+        list.add(VoiceNote("voice note 30-05-2020 0321", Calendar.getInstance(),"/storage/emulated/0/"+getString(R.string.app_name)+"/voice note 30-05-2020 0321.mp3"))
+        list.add(VoiceNote("voice note 30-05-2020 0322",Calendar.getInstance(),"/storage/emulated/0/"+getString(R.string.app_name)+"/voice note 30-05-2020 0322.mp3"))
+        list.add(VoiceNote("voice note 30-05-2020 2210",Calendar.getInstance(),"/storage/emulated/0/"+getString(R.string.app_name)+"/voice note 30-05-2020 2210.mp3"))
+
+        listView.adapter = ListAdapter(this,R.layout.item,list)
 
         checkLogged()
+
+//        val numbers = setOf("1", "2", "3", "4")
+//        SharedPreferencesManager.setRecordedVoiceNote(applicationContext,numbers)
+//
+//        accelerometerSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+//        if (accelerometerSensor == null) {
+//            Toast.makeText(this, "Device has no accelerometer sensor", Toast.LENGTH_SHORT).show()
+//        }
+//
+//        audioSetup()
+    }
+
+    private fun init(){
+        val numbers = setOf("1", "2", "3", "4")
+        SharedPreferencesManager.setRecordedVoiceNote(applicationContext,numbers)
 
         accelerometerSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         if (accelerometerSensor == null) {
@@ -57,6 +87,8 @@ class MainActivity : BaseActivity() {
         }
         var loggedUser = SharedPreferencesManager.getUserLogged(applicationContext)
         email_user_text.text = "Hello $loggedUser!"
+
+        init()
     }
 
     private fun isLogged(): Boolean {
@@ -127,7 +159,10 @@ class MainActivity : BaseActivity() {
 
     private fun stop(){
         stopBtn.isEnabled = false
+        stopBtn.visibility = View.INVISIBLE
+
         pauseResumeBtn.isEnabled = true
+        pauseResumeBtn.visibility = View.VISIBLE
 
         if (isRecording) {
             mediaRecorder?.stop()
@@ -139,6 +174,8 @@ class MainActivity : BaseActivity() {
             mediaPlayer = null
         }
         recordBtn.isEnabled = true
+        recordBtn.visibility = View.VISIBLE
+
         Toast.makeText(this,"Saving "+audioFilePath, Toast.LENGTH_SHORT).show()
     }
 
@@ -153,9 +190,15 @@ class MainActivity : BaseActivity() {
 
     private fun record(){
         isRecording = true
+
         stopBtn.isEnabled = true
+        stopBtn.visibility = View.VISIBLE
+
         recordBtn.isEnabled = false
+        recordBtn.visibility = View.INVISIBLE
+
         pauseResumeBtn.isEnabled = true
+        stopBtn.visibility = View.VISIBLE
         try {
             mediaRecorder = MediaRecorder()
             mediaRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
@@ -164,15 +207,18 @@ class MainActivity : BaseActivity() {
 
             var currentDate = formatter.format(Date())
 
-            audioFilePath = Environment.getExternalStorageDirectory().absolutePath + "/voice note "+currentDate+".mp3"
+            File(Environment.getExternalStorageDirectory().absolutePath + "/"+getString(R.string.app_name)).mkdir()
+
+            audioFilePath = Environment.getExternalStorageDirectory().absolutePath + "/"+getString(R.string.app_name)+"/voice note "+currentDate+".mp3"
             mediaRecorder?.setOutputFile(audioFilePath)
             mediaRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT)
             mediaRecorder?.prepare()
+
+            mediaRecorder?.start()
+            Toast.makeText(this,"Recording "+audioFilePath, Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        mediaRecorder?.start()
-        Toast.makeText(this,"Recording "+audioFilePath, Toast.LENGTH_SHORT).show()
     }
 
     private fun hasMicrophone(): Boolean {

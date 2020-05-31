@@ -9,6 +9,7 @@ object SharedPreferencesManager {
 
     private const val USER_LOGGER = "user_logged"
     private const val TOKEN = "token"
+    private const val RECORDEDVOICENOTE = "recordedVoiceNote"
 
     private fun getSharedPreferences(context: Context): SharedPreferences {
         return context.getSharedPreferences(
@@ -45,5 +46,12 @@ object SharedPreferencesManager {
         var editor = getSharedPreferences(context).edit()
         editor.clear()
         editor.apply()
+    }
+
+    fun setRecordedVoiceNote(context: Context, newValue: Set<String>) {
+        val editor =
+            getSharedPreferences(context).edit()
+        editor.putStringSet(TOKEN, newValue)
+        editor.commit()
     }
 }
