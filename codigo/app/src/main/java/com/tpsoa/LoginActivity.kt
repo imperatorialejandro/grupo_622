@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
+import com.tpsoa.common.Utils
 import com.tpsoa.model.SignInRequest
 import com.tpsoa.rest.ApiInterface
 import com.tpsoa.rest.ServiceBuilder
@@ -58,6 +59,11 @@ class LoginActivity : BaseActivity() {
     }
 
     fun onLoginClick(v: View) {
+        if(!Utils.isOnline(this)) {
+            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         login_btn.isEnabled = false
 
         val email = user_text!!.text.toString()
@@ -85,8 +91,8 @@ class LoginActivity : BaseActivity() {
 
     private fun onLoginSuccess(req: SignInRequest,token: String) {
         Toast.makeText(this, "Sign in successfully", Toast.LENGTH_SHORT).show()
-        SharedPreferencesManager.setUserLogged(applicationContext, getUsernameFromEmail(req.email))
-        SharedPreferencesManager.setToken(applicationContext, token)
+        SharedPreferencesManager.setUserLogged(getUsernameFromEmail(req.email))
+        SharedPreferencesManager.setToken(token)
         startActivity(Intent(this, MainActivity::class.java))
         finish()
     }
@@ -96,7 +102,7 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun onLoginFailed(message: String = "Incorrect email or password") {
-        Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun validateEmail() {

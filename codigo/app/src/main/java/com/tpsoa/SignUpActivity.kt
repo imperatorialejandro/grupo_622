@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.core.text.isDigitsOnly
+import com.tpsoa.common.Utils
 import com.tpsoa.model.SignUpRequest
 import com.tpsoa.rest.ApiInterface
 import com.tpsoa.rest.ServiceBuilder
@@ -198,6 +199,11 @@ class SignUpActivity : BaseActivity() {
     }
 
     fun onRegistrationClick(v: View) {
+        if(!Utils.isOnline(this)) {
+            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         registration_btn.isEnabled = false
 
         val name = name_text!!.text.toString()

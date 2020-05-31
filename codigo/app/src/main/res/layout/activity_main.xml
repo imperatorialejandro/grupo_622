@@ -32,6 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:enabled="false"
             android:drawableStart="@android:drawable/ic_media_pause"
             android:onClick="onPauseResumeClick"
             android:text="@string/pause" />
@@ -40,6 +41,7 @@
             android:id="@+id/stopBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:enabled="false"
             android:drawableStart="@android:drawable/checkbox_off_background"
             android:onClick="onStopClick"
             android:text="@string/stop"
