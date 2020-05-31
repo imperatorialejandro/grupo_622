@@ -19,6 +19,13 @@
             android:textSize="15sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 min, 0 sec " />
+
         <TextView
             android:id="@+id/location"
             android:text="Location"
@@ -26,16 +33,10 @@
             android:layout_height="wrap_content" />
 
         <TextView
-            android:id="@+id/txtStartTime"
+            android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0 min, 0 sec" />
-
-        <TextView
-            android:id="@+id/txtSongTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0 min, 0 sec " />
+            android:text="00:00" />
 
         <SeekBar
             android:id="@+id/seekBar"
