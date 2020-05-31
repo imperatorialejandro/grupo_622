@@ -16,11 +16,13 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import com.tpsoa.common.GpsUtils
 import com.tpsoa.sharedpreferences.SharedPreferencesManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.pow
+
 
 class MainActivity : BaseActivity() {
 
@@ -47,7 +49,10 @@ class MainActivity : BaseActivity() {
             Toast.makeText(this, "Device has no accelerometer sensor", Toast.LENGTH_SHORT).show()
         }
 
-        audioSetup()
+        GpsUtils.getLocation(this) { location ->
+            Log.d("got_location", location)
+        }
+
     }
 
     private fun checkLogged() {
@@ -55,12 +60,12 @@ class MainActivity : BaseActivity() {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
-        var loggedUser = SharedPreferencesManager.getUserLogged(applicationContext)
+        var loggedUser = SharedPreferencesManager.getUserLogged()
         email_user_text.text = "Hello $loggedUser!"
     }
 
     private fun isLogged(): Boolean {
-        return SharedPreferencesManager.getUserLogged(applicationContext) != ""
+        return SharedPreferencesManager.getUserLogged() != ""
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -80,7 +85,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun onLogoutClick() {
-        SharedPreferencesManager.clearPrefs(applicationContext)
+        SharedPreferencesManager.clearPrefs()
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
     }
@@ -100,11 +105,9 @@ class MainActivity : BaseActivity() {
                 lastShakeTime = curTime
                 Log.i("asd","isRecording: "+isRecording)
                 if(isRecording){
-                    Log.i("asd","deja de grabar")
                     stop()
                 }
                 else {
-                    Log.i("asd","pasa a grabar")
                     record()
                 }
             }
@@ -143,12 +146,15 @@ class MainActivity : BaseActivity() {
     }
 
     fun onRecordClick(view: View) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-            != PackageManager.PERMISSION_GRANTED) {
+        if (!hasRecordPermission()) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 10)
-        } else {
-            record()
+            return
         }
+        record()
+    }
+
+    private fun hasRecordPermission(): Boolean {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun record(){
@@ -175,22 +181,6 @@ class MainActivity : BaseActivity() {
         Toast.makeText(this,"Recording "+audioFilePath, Toast.LENGTH_SHORT).show()
     }
 
-    private fun hasMicrophone(): Boolean {
-        val pmanager = this.packageManager
-        return pmanager.hasSystemFeature(
-            PackageManager.FEATURE_MICROPHONE)
-    }
-
-    private fun audioSetup() {
-        if (!hasMicrophone()) {
-            stopBtn.isEnabled = false
-            recordBtn.isEnabled = false
-        } else {
-            stopBtn.isEnabled = false
-            pauseResumeBtn.isEnabled = false
-        }
-    }
-
     fun onPauseResumeClick(view: View) {
         if(isRecording) {
             pauseRecording()
@@ -213,4 +203,7 @@ class MainActivity : BaseActivity() {
         isRecording = false
         pauseResumeBtn.text = "Resume"
     }
+
 }
+
+
