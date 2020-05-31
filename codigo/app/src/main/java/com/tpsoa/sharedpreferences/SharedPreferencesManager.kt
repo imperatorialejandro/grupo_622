@@ -3,7 +3,6 @@ package com.tpsoa.sharedpreferences
 import android.content.Context
 import android.content.SharedPreferences
 
-
 object SharedPreferencesManager {
     private const val APP_SETTINGS = "com.tpsoa.voicerecorder"
 
@@ -43,15 +42,21 @@ object SharedPreferencesManager {
     }
 
     fun clearPrefs(context: Context) {
-        var editor = getSharedPreferences(context).edit()
-        editor.clear()
-        editor.apply()
+        setToken(context, "")
+        setUserLogged(context, "")
     }
 
-    fun setRecordedVoiceNote(context: Context, newValue: Set<String>) {
+    fun setRecordedVoiceNote(context: Context, newValue: MutableSet<String>?) {
         val editor =
             getSharedPreferences(context).edit()
-        editor.putStringSet(TOKEN, newValue)
+        editor.putStringSet(getUserLogged(context), newValue)
         editor.commit()
+    }
+
+    fun getRecordedVoiceNotes(context: Context): MutableSet<String>? {
+        return getSharedPreferences(context).getStringSet(
+            getUserLogged(context),
+            mutableSetOf()
+        )
     }
 }
