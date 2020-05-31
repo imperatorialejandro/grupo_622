@@ -1,6 +1,8 @@
 package com.tpsoa
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -9,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.ActivityCompat
 
 open class BaseActivity : AppCompatActivity(), SensorEventListener {
 
@@ -25,6 +28,23 @@ open class BaseActivity : AppCompatActivity(), SensorEventListener {
             Toast.makeText(this, "Device has no light sensor", Toast.LENGTH_SHORT).show()
         }
 
+        checkLocationPermission()
+    }
+
+    private fun checkLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION),
+            1000)
+        }
     }
 
     override fun onPause() {
