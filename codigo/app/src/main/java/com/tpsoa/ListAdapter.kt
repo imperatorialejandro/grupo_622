@@ -83,6 +83,7 @@ class ListAdapter(var cont: Context, var resource: Int, var items: List<VoiceNot
             timeTextView.text = "00:00"
             player.seekTo(0)
             handler.removeCallbacks(runnable)
+            player.release()
         }
 
         playBtn.setOnClickListener {

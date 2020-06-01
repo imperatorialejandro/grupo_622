@@ -10,52 +10,48 @@ object SharedPreferencesManager {
     private const val TOKEN = "token"
     private const val RECORDEDVOICENOTE = "recordedVoiceNote"
 
-    private fun getSharedPreferences(context: Context): SharedPreferences {
-        return context.getSharedPreferences(
-            APP_SETTINGS,
-            Context.MODE_PRIVATE
-        )
+    private lateinit var sharedPreferences: SharedPreferences
+
+    fun init(context: Context) {
+        sharedPreferences = context.getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE)
     }
 
     fun getToken(context: Context): String? {
-        return getSharedPreferences(context)
-            .getString(TOKEN, "")
+        return sharedPreferences.getString(TOKEN, "")
     }
 
-    fun setToken(context: Context, newValue: String) {
+    fun setToken(newValue: String) {
         val editor =
-            getSharedPreferences(context).edit()
+            sharedPreferences.edit()
         editor.putString(TOKEN, newValue)
         editor.commit()
     }
 
-    fun getUserLogged(context: Context): String? {
-        return getSharedPreferences(context)
+    fun getUserLogged(): String? {
+        return sharedPreferences
             .getString(USER_LOGGER, "")
     }
 
-    fun setUserLogged(context: Context, newValue: String) {
-        val editor =
-            getSharedPreferences(context).edit()
+    fun setUserLogged(newValue: String) {
+        val editor =sharedPreferences.edit()
         editor.putString(USER_LOGGER, newValue)
         editor.commit()
     }
 
-    fun clearPrefs(context: Context) {
-        setToken(context, "")
-        setUserLogged(context, "")
+    fun clearPrefs() {
+        setToken("")
+        setUserLogged("")
     }
 
-    fun setRecordedVoiceNote(context: Context, newValue: MutableSet<String>?) {
-        val editor =
-            getSharedPreferences(context).edit()
-        editor.putStringSet(getUserLogged(context), newValue)
+    fun setRecordedVoiceNote(newValue: MutableSet<String>?) {
+        val editor = sharedPreferences.edit()
+        editor.putStringSet(getUserLogged(), newValue)
         editor.commit()
     }
 
-    fun getRecordedVoiceNotes(context: Context): MutableSet<String>? {
-        return getSharedPreferences(context).getStringSet(
-            getUserLogged(context),
+    fun getRecordedVoiceNotes(): MutableSet<String>? {
+        return sharedPreferences.getStringSet(
+            getUserLogged(),
             mutableSetOf()
         )
     }
