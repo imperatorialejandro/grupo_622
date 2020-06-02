@@ -1,8 +1,8 @@
 package com.tpsoa
 
-import android.R.attr.duration
 import android.content.Context
 import android.media.MediaPlayer
+import android.media.MediaPlayer.OnPreparedListener
 import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,11 +21,7 @@ import java.util.concurrent.TimeUnit
 class ListAdapter(var cont: Context, var resource: Int, var items: List<VoiceNote>) :
     ArrayAdapter<VoiceNote>(cont, resource, items) {
 
-    //    private lateinit var player: MediaPlayer
-//    private lateinit var startTime: TextView
-    private lateinit var songTime: TextView
-
-    //    private lateinit var seekBar: SeekBar
+//    private lateinit var player: MediaPlayer
     private lateinit var runnable: Runnable
     private var handler: Handler = Handler()
 
@@ -54,26 +50,29 @@ class ListAdapter(var cont: Context, var resource: Int, var items: List<VoiceNot
 
         var seekBar = view.findViewById<SeekBar>(R.id.seekBar)
 
-
         var voiceNote: VoiceNote = items[position]
 
         var file = File(voiceNote.path)
 
-        var player = MediaPlayer()
-        player.setDataSource(voiceNote.path)
-        player.prepare()
-
-        var duration = String.format(
-            "%02d:%02d",
-            TimeUnit.MILLISECONDS.toMinutes(player.duration.toLong()),
-            TimeUnit.MILLISECONDS.toSeconds(player.duration.toLong()) -
-                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(player.duration.toLong()))
-        )
-
         nameTextView.text = file.name
-        durationTextView.text = duration
         locationTextView.text = voiceNote.location
 
+        var player = MediaPlayer()
+        player.setDataSource(voiceNote.path)
+        player.prepareAsync()
+
+        player.setOnPreparedListener(OnPreparedListener {
+            var duration = String.format(
+                "%02d:%02d",
+                TimeUnit.MILLISECONDS.toMinutes(player.duration.toLong()),
+                TimeUnit.MILLISECONDS.toSeconds(player.duration.toLong()) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(player.duration.toLong()))
+            )
+
+            durationTextView.text = duration
+
+            playBtn.isEnabled = true
+        })
 
         player.setOnCompletionListener { player ->
             playBtn.text = "play"
@@ -82,9 +81,12 @@ class ListAdapter(var cont: Context, var resource: Int, var items: List<VoiceNot
             timeTextView.text = "00:00"
             player.seekTo(0)
             handler.removeCallbacks(runnable)
+            player.stop()
+//            player.release()
+
             player.reset()
-            player.setDataSource(voiceNote.path)
-            player.prepare()
+//            player.setDataSource(voiceNote.path)
+            player.prepareAsync()
         }
 
         playBtn.setOnClickListener {
@@ -147,7 +149,8 @@ class ListAdapter(var cont: Context, var resource: Int, var items: List<VoiceNot
 
         return view
     }
-//    private fun initializeSeekBar() {
+
+    //    private fun initializeSeekBar() {
 //        seek_bar.max = player.seconds
 //
 //        runnable = Runnable {

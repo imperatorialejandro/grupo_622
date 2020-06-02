@@ -52,6 +52,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:background="@drawable/play_btn_background"
-        android:text="play"/>
+        android:enabled="false"
+        android:text="play" />
 
 </LinearLayout>
