@@ -1,8 +1,10 @@
 package com.tpsoa.rest
 
-import com.tpsoa.model.SignInRequest
-import com.tpsoa.model.SignUpRequest
+import com.tpsoa.model.*
+import com.tpsoa.sharedpreferences.SharedPreferencesManager
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -14,17 +16,6 @@ object ApiConstants {
     const val CONTENT_TYPE_HEADER = "Content-Type:application/json"
 }
 
-data class SignInResponse(
-    val state: String,
-    val msg: String,
-    val token: String
-)
-
-data class SignUpResponse(
-    val state: String,
-    val token: String,
-    val msg: String
-)
 
 interface ApiInterface {
     @Headers(ApiConstants.CONTENT_TYPE_HEADER)
@@ -34,12 +25,18 @@ interface ApiInterface {
     @Headers(ApiConstants.CONTENT_TYPE_HEADER)
     @POST("register")
     fun SignUp(@Body info: SignUpRequest): Call<SignUpResponse>
+
+    @Headers(ApiConstants.CONTENT_TYPE_HEADER)
+    @POST("event")
+    fun RegisterEvent(@Body info: EventRequest): Call<EventResponse>
 }
 
 object ServiceBuilder {
     private const val BASE_URL: String = "http://so-unlam.net.ar/api/api/"
 
-    private val client = OkHttpClient.Builder().build()
+    private val client: OkHttpClient = OkHttpClient.Builder().apply {
+        this.addInterceptor(AuthInterceptor())
+    }.build()
 
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)

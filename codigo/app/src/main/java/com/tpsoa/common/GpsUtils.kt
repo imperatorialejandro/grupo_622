@@ -23,17 +23,20 @@ object GpsUtils {
         fusedLocationClient =  LocationServices.getFusedLocationProviderClient(context)
         geocoder = Geocoder(context, Locale.getDefault())
     }
-    @SuppressLint("MissingPermission")
 
+    @SuppressLint("MissingPermission")
     fun getLocation(context: Context, callback: (String) -> Unit) {
         if(!Utils.isOnline(context)) {
             return
         }
+
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location : Location? ->
-                var address = geocoder.getFromLocation(location!!.latitude, location!!.longitude, 1)[0]
-                currentLocation = buildLocation(address)
-                callback.invoke(this.currentLocation)
+                if (location != null) {
+                    var address = geocoder.getFromLocation(location!!.latitude, location!!.longitude, 1)[0]
+                    currentLocation = buildLocation(address)
+                    callback.invoke(this.currentLocation)
+                }
             }
     }
 

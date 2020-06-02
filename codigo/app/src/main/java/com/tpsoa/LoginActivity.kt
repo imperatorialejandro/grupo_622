@@ -7,10 +7,11 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import com.tpsoa.common.Utils
+import com.tpsoa.model.EventRequest
 import com.tpsoa.model.SignInRequest
+import com.tpsoa.model.SignInResponse
 import com.tpsoa.rest.ApiInterface
 import com.tpsoa.rest.ServiceBuilder
-import com.tpsoa.rest.SignInResponse
 import com.tpsoa.sharedpreferences.SharedPreferencesManager
 import kotlinx.android.synthetic.main.activity_login.*
 import retrofit2.Call
@@ -93,12 +94,19 @@ class LoginActivity : BaseActivity() {
         Toast.makeText(this, "Sign in successfully", Toast.LENGTH_SHORT).show()
         SharedPreferencesManager.setUserLogged(getUsernameFromEmail(req.email))
         SharedPreferencesManager.setToken(token)
+        registerLoginEvent()
         startActivity(Intent(this, MainActivity::class.java))
         finish()
     }
 
     private fun getUsernameFromEmail(email: String): String {
         return email.split("@").toTypedArray()[0]
+    }
+
+    private fun registerLoginEvent() {
+        var userLogged = SharedPreferencesManager.getUserLogged()
+        var event = EventRequest("Login", "ACTIVO", "User $userLogged logged")
+        registerEvent(event)
     }
 
     private fun onLoginFailed(message: String = "Incorrect email or password") {

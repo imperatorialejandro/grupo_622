@@ -9,11 +9,12 @@ import android.widget.Toast
 import androidx.core.text.isDigitsOnly
 import com.tpsoa.common.Utils
 import com.tpsoa.model.SignUpRequest
+import com.tpsoa.model.SignUpResponse
 import com.tpsoa.rest.ApiInterface
 import com.tpsoa.rest.ServiceBuilder
-import com.tpsoa.rest.SignUpResponse
 import kotlinx.android.synthetic.main.activity_login.password_text
 import kotlinx.android.synthetic.main.activity_sign_up.*
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -223,8 +224,8 @@ class SignUpActivity : BaseActivity() {
                 if (response.isSuccessful){
                     onSignUpSuccess()
                 } else {
-                    val res = response.errorBody() as SignUpResponse
-                    onSignUpFailed(res.msg)
+                    var errorBody = JSONObject(response.errorBody()!!.string())
+                    onSignUpFailed(errorBody.get("msg").toString())
                 }
                 registration_btn.isEnabled = true
             }

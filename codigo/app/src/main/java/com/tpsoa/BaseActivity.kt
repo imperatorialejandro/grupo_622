@@ -9,9 +9,18 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
+import com.tpsoa.model.EventRequest
+import com.tpsoa.model.EventResponse
+import com.tpsoa.rest.ApiInterface
+import com.tpsoa.rest.ServiceBuilder
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 open class BaseActivity : AppCompatActivity(), SensorEventListener {
 
@@ -74,4 +83,24 @@ open class BaseActivity : AppCompatActivity(), SensorEventListener {
     }
 
     open fun accelerometerSensorTriggered(event: SensorEvent) {}
+
+    fun registerEvent(event: EventRequest) {
+        val request = ServiceBuilder.buildService(ApiInterface::class.java)
+        val call = request.RegisterEvent(event)
+
+        call.enqueue(object : Callback<EventResponse> {
+            override fun onResponse(call: Call<EventResponse>, response: Response<EventResponse>) {
+                if (response.isSuccessful){
+                    val res = response.body() as EventResponse
+                    Log.i("Event registered", res.event.type)
+                } else {
+                    var errorBody = JSONObject(response.errorBody()!!.string())
+                    Log.e("Error registering event", errorBody.get("msg").toString())
+                }
+            }
+            override fun onFailure(call: Call<EventResponse>, t: Throwable) {
+                Log.e("Error registering event", t.message)
+            }
+        })
+    }
 }
