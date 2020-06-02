@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.pow
 
+
 class MainActivity : BaseActivity() {
 
     private var accelerometerSensor: Sensor? = null
@@ -47,17 +48,6 @@ class MainActivity : BaseActivity() {
 
         checkLogged()
 
-        recordedVoiceNotes = SharedPreferencesManager.getRecordedVoiceNotes()
-
-        accelerometerSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        if (accelerometerSensor == null) {
-            Toast.makeText(this, "Device has no accelerometer sensor", Toast.LENGTH_SHORT).show()
-        }
-
-        updateListView()
-    }
-
-    private fun init() {
         recordedVoiceNotes = SharedPreferencesManager.getRecordedVoiceNotes()
 
         accelerometerSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -141,6 +131,7 @@ class MainActivity : BaseActivity() {
     override fun onPause() {
         super.onPause()
         sensorManager?.unregisterListener(this);
+        mediaRecorder.release()
     }
 
     fun onStopClick(view: View) {
@@ -154,7 +145,7 @@ class MainActivity : BaseActivity() {
 
         if (isRecording) {
             mediaRecorder.stop()
-            mediaRecorder.release()
+            mediaRecorder.reset()
 //            mediaRecorder = null
             isRecording = false
         }
@@ -173,22 +164,16 @@ class MainActivity : BaseActivity() {
     }
 
     fun onRecordClick(view: View) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
+        if (!hasRecordPermission()) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 10)
-        } else {
-            record()
+            return
         }
+        record()
     }
 
     private fun hasRecordPermission(): Boolean {
-        return ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.RECORD_AUDIO
-        ) == PackageManager.PERMISSION_GRANTED
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
     }
-
     private fun record() {
         isRecording = true
 
@@ -200,18 +185,14 @@ class MainActivity : BaseActivity() {
 
         mediaRecorder = MediaRecorder()
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
-        mediaRecorder.setOutputFormat(
-            MediaRecorder.OutputFormat.DEFAULT
-        )
-
-        var currentDate = formatter.format(Date())
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT)
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT)
 
         File(Environment.getExternalStorageDirectory().absolutePath + "/" + getString(R.string.app_name)).mkdir()
 
-        audioFilePath =
-            Environment.getExternalStorageDirectory().absolutePath + "/" + getString(R.string.app_name) + "/voice note " + currentDate + ".mp3"
+        var currentDate = formatter.format(Date())
+        audioFilePath = Environment.getExternalStorageDirectory().absolutePath + "/" + getString(R.string.app_name) + "/voice note " + currentDate + ".mp3"
         mediaRecorder.setOutputFile(audioFilePath)
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT)
 
         try {
             mediaRecorder.prepare()
@@ -257,3 +238,5 @@ class MainActivity : BaseActivity() {
         listView.adapter = ListAdapter(this, R.layout.item, list)
     }
 }
+
+

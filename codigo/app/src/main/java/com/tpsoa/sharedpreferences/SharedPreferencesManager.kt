@@ -16,13 +16,12 @@ object SharedPreferencesManager {
         sharedPreferences = context.getSharedPreferences(APP_SETTINGS, Context.MODE_PRIVATE)
     }
 
-    fun getToken(context: Context): String? {
+    fun getToken(): String? {
         return sharedPreferences.getString(TOKEN, "")
     }
 
     fun setToken(newValue: String) {
-        val editor =
-            sharedPreferences.edit()
+        val editor = sharedPreferences.edit()
         editor.putString(TOKEN, newValue)
         editor.commit()
     }
@@ -33,7 +32,7 @@ object SharedPreferencesManager {
     }
 
     fun setUserLogged(newValue: String) {
-        val editor =sharedPreferences.edit()
+        val editor = sharedPreferences.edit()
         editor.putString(USER_LOGGER, newValue)
         editor.commit()
     }

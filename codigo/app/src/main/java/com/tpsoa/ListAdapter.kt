@@ -78,12 +78,13 @@ class ListAdapter(var cont: Context, var resource: Int, var items: List<VoiceNot
         player.setOnCompletionListener { player ->
             playBtn.text = "play"
             Log.i("asd", "stoping " + voiceNote.path)
-//            player.reset()
             seekBar.progress = 0
             timeTextView.text = "00:00"
             player.seekTo(0)
             handler.removeCallbacks(runnable)
-            player.release()
+            player.reset()
+            player.setDataSource(voiceNote.path)
+            player.prepare()
         }
 
         playBtn.setOnClickListener {
