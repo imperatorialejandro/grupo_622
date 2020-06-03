@@ -56,4 +56,13 @@
         android:layout_gravity="center"
         android:background="@drawable/ic_play_btn"/>
 
+    <Button
+        android:id="@+id/pauseBtn"
+        android:layout_height="40dp"
+        android:layout_width="30dp"
+        android:layout_weight="0"
+        android:layout_gravity="center"
+        android:background="@drawable/ic_pause_btn"
+        android:visibility="gone"/>
+
 </LinearLayout>

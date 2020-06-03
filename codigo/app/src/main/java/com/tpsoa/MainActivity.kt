@@ -22,6 +22,7 @@ import com.google.gson.Gson
 import com.tpsoa.model.VoiceNote
 import com.tpsoa.sharedpreferences.SharedPreferencesManager
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.item.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -171,6 +172,7 @@ class MainActivity : BaseActivity() {
     private fun hasRecordPermission(): Boolean {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
     }
+
     private fun record() {
         isRecording = true
 

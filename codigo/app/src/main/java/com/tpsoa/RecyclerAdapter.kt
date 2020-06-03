@@ -46,6 +46,7 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
         val locationTextView = view.findViewById(R.id.location) as TextView
         val timeTextView = view.findViewById(R.id.time) as TextView
         val playBtn = view.findViewById(R.id.playBtn) as Button
+        val pauseBtn = view.findViewById(R.id.pauseBtn) as Button
         val seekBar = view.findViewById(R.id.seekBar) as SeekBar
 
         private lateinit var runnable: Runnable
@@ -70,39 +71,37 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
                 )
 
                 durationTextView.text = duration
-
-                playBtn.isEnabled = true
             })
 
             playBtn.setOnClickListener {
-                if (mediaPlayer.isPlaying) {
-                    mediaPlayer.pause()
-                    playBtn.background = ContextCompat.getDrawable(context, R.drawable.ic_pause_btn)
-                } else {
-                    playBtn.background = ContextCompat.getDrawable(context, R.drawable.ic_play_btn)
+                showPause()
 
-                    seekBar.max = mediaPlayer.duration / 1000
-                    runnable = Runnable {
-                        seekBar.progress = mediaPlayer.currentPosition / 1000
+                seekBar.max = mediaPlayer.duration / 1000
+                runnable = Runnable {
+                    seekBar.progress = mediaPlayer.currentPosition / 1000
 
-                        var current = String.format(
-                            "%02d:%02d",
-                            TimeUnit.MILLISECONDS.toMinutes(mediaPlayer.currentPosition.toLong()),
-                            TimeUnit.MILLISECONDS.toSeconds(mediaPlayer.currentPosition.toLong()) -
-                                    TimeUnit.MINUTES.toSeconds(
-                                        TimeUnit.MILLISECONDS.toMinutes(
-                                            mediaPlayer.currentPosition.toLong()
-                                        )
+                    var current = String.format(
+                        "%02d:%02d",
+                        TimeUnit.MILLISECONDS.toMinutes(mediaPlayer.currentPosition.toLong()),
+                        TimeUnit.MILLISECONDS.toSeconds(mediaPlayer.currentPosition.toLong()) -
+                                TimeUnit.MINUTES.toSeconds(
+                                    TimeUnit.MILLISECONDS.toMinutes(
+                                        mediaPlayer.currentPosition.toLong()
                                     )
-                        )
-                        timeTextView.text = current
+                                )
+                    )
+                    timeTextView.text = current
 
-                        handler.postDelayed(runnable, 1000)
-                    }
                     handler.postDelayed(runnable, 1000)
-
-                    mediaPlayer.start()
                 }
+                handler.postDelayed(runnable, 1000)
+
+                mediaPlayer.start()
+            }
+
+            pauseBtn.setOnClickListener {
+                mediaPlayer.pause()
+                showPlay()
             }
 
             mediaPlayer.setOnCompletionListener {
@@ -115,7 +114,21 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
                 mediaPlayer.reset()
                 mediaPlayer.setDataSource(voiceNote.path)
                 mediaPlayer.prepareAsync()
+
+                showPlay()
             }
         }
+
+        private fun showPlay() {
+            pauseBtn.visibility = View.GONE
+            playBtn.visibility = View.VISIBLE
+        }
+
+        private fun showPause() {
+            playBtn.visibility = View.GONE
+            pauseBtn.visibility = View.VISIBLE
+        }
+
     }
+
 }
