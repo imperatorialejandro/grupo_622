@@ -19,7 +19,7 @@
             <EditText
                 android:id="@+id/name_text"
                 android:layout_width="match_parent"
-                android:hint="Name"
+                android:hint="@string/name"
                 android:padding="10dp"
                 android:layout_height="wrap_content">
             </EditText>
@@ -27,7 +27,7 @@
             <EditText
                 android:id="@+id/lastname_text"
                 android:layout_width="match_parent"
-                android:hint="LastName"
+                android:hint="@string/lastname"
                 android:padding="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_height="wrap_content">
@@ -36,7 +36,7 @@
             <EditText
                 android:id="@+id/dni_text"
                 android:layout_width="match_parent"
-                android:hint="DNI"
+                android:hint="@string/dni"
                 android:padding="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_height="wrap_content">
@@ -45,7 +45,7 @@
             <EditText
                 android:id="@+id/group_text"
                 android:layout_width="match_parent"
-                android:hint="Group"
+                android:hint="@string/group"
                 android:padding="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_height="wrap_content">
@@ -54,7 +54,7 @@
             <EditText
                 android:id="@+id/commission_text"
                 android:layout_width="match_parent"
-                android:hint="Commission"
+                android:hint="@string/commission"
                 android:padding="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_height="wrap_content">
@@ -63,7 +63,7 @@
             <EditText
                 android:id="@+id/email_text"
                 android:layout_width="match_parent"
-                android:hint="Email address"
+                android:hint="@string/email_address"
                 android:padding="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_height="wrap_content">
@@ -72,7 +72,7 @@
             <EditText
                 android:id="@+id/password_text"
                 android:layout_width="match_parent"
-                android:hint="Password"
+                android:hint="@string/password"
                 android:padding="10dp"
                 android:layout_marginTop="10dp"
                 android:inputType="textPassword"
@@ -82,7 +82,7 @@
             <EditText
                 android:id="@+id/password_confirmation_text"
                 android:layout_width="match_parent"
-                android:hint="Confirm Password"
+                android:hint="@string/confirm_password"
                 android:padding="10dp"
                 android:layout_marginTop="10dp"
                 android:inputType="textPassword"
@@ -92,7 +92,7 @@
             <Button
                 android:id="@+id/registration_btn"
                 android:layout_width="match_parent"
-                android:text="Sign up"
+                android:text="@string/sign_up"
                 android:onClick="onRegistrationClick"
                 android:enabled="false"
                 android:background="@drawable/login_btn_background"
@@ -105,7 +105,7 @@
             <TextView
                 android:id="@+id/already_registered"
                 android:layout_width="wrap_content"
-                android:text="I already have an account"
+                android:text="@string/already_have_an_account"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:onClick="onLoginClick"

@@ -236,6 +236,8 @@ class MainActivity : BaseActivity() {
         }
 
         listView.adapter = ListAdapter(this, R.layout.item, list)
+        val emptyText = findViewById<View>(android.R.id.empty) as TextView
+        listView.emptyView = emptyText
     }
 }
 

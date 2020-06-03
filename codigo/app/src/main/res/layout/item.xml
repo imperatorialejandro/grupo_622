@@ -4,15 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="10dp">
+    android:padding="5dp">
 
     <LinearLayout
-        android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:orientation="vertical"
-        android:layout_weight="9">
+        android:layout_weight="10">
+
         <TextView
             android:id="@+id/name"
             android:text="Name"
@@ -24,7 +24,7 @@
             android:id="@+id/duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0 min, 0 sec " />
+            android:text="0 min, 0 sec" />
 
         <TextView
             android:id="@+id/location"
@@ -42,8 +42,8 @@
             android:id="@+id/seekBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:saveEnabled="false"
-            />
+            android:saveEnabled="false"/>
+
     </LinearLayout>
 
     <Button
@@ -51,6 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:layout_gravity="center"
         android:background="@drawable/play_btn_background"
         android:enabled="false"
         android:text="play" />
