@@ -8,7 +8,6 @@ object SharedPreferencesManager {
 
     private const val USER_LOGGER = "user_logged"
     private const val TOKEN = "token"
-    private const val RECORDEDVOICENOTE = "recordedVoiceNote"
 
     private lateinit var sharedPreferences: SharedPreferences
 

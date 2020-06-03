@@ -12,8 +12,11 @@ import android.os.Environment
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.tpsoa.common.GpsUtils
 import com.google.gson.Gson
 import com.tpsoa.model.VoiceNote
@@ -42,6 +45,9 @@ class MainActivity : BaseActivity() {
 
     private var gson = Gson()
 
+    lateinit var mRecyclerView : RecyclerView
+    val mAdapter : RecyclerAdapter = RecyclerAdapter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -65,10 +71,6 @@ class MainActivity : BaseActivity() {
         }
         var loggedUser = SharedPreferencesManager.getUserLogged()
         email_user_text.text = "Hello $loggedUser!"
-
-//        recordedVoiceNotes = SharedPreferencesManager.getRecordedVoiceNotes(applicationContext)
-
-//        init()
     }
 
     private fun isLogged(): Boolean {
@@ -130,8 +132,7 @@ class MainActivity : BaseActivity() {
 
     override fun onPause() {
         super.onPause()
-        sensorManager?.unregisterListener(this);
-        mediaRecorder.release()
+        sensorManager?.unregisterListener(this)
     }
 
     fun onStopClick(view: View) {
@@ -146,13 +147,9 @@ class MainActivity : BaseActivity() {
         if (isRecording) {
             mediaRecorder.stop()
             mediaRecorder.reset()
-//            mediaRecorder = null
             isRecording = false
         }
         recordBtn.visibility = View.VISIBLE
-
-        Toast.makeText(this, "Saving " + audioFilePath, Toast.LENGTH_SHORT).show()
-
 
         GpsUtils.getLocation(this) { location ->
             var v = audioFilePath?.let { VoiceNote(it, location) }
@@ -235,9 +232,22 @@ class MainActivity : BaseActivity() {
             list.add(v)
         }
 
-        listView.adapter = ListAdapter(this, R.layout.item, list)
         val emptyText = findViewById<View>(android.R.id.empty) as TextView
-        listView.emptyView = emptyText
+
+        mRecyclerView = findViewById(R.id.voiceNotesList) as RecyclerView
+        mRecyclerView.setHasFixedSize(true)
+        mRecyclerView.layoutManager = LinearLayoutManager(this)
+        mAdapter.RecyclerAdapter(list, this)
+        mRecyclerView.adapter = mAdapter
+
+        if(list.isEmpty()){
+            mRecyclerView.visibility = View.GONE
+            emptyText.visibility = View.VISIBLE
+        }
+        else {
+            mRecyclerView.visibility = View.VISIBLE
+            emptyText.visibility = View.GONE
+        }
     }
 }
 
