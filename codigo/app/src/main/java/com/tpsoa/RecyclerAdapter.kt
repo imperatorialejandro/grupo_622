@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.tpsoa.model.VoiceNote
 import java.io.File
@@ -75,10 +76,9 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
 
             playBtn.setOnClickListener {
                 if (mediaPlayer.isPlaying) {
-                    playBtn.text = "play"
                     mediaPlayer.pause()
                 } else {
-                    playBtn.text = "pause"
+                    playBtn.background = ContextCompat.getDrawable(context, R.drawable.ic_pause_btn)
 
                     seekBar.max = mediaPlayer.duration / 1000
                     runnable = Runnable {
@@ -105,7 +105,6 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
             }
 
             mediaPlayer.setOnCompletionListener {
-                playBtn.text = "play"
                 seekBar.progress = 0
                 timeTextView.text = "00:00"
                 mediaPlayer.seekTo(0)
