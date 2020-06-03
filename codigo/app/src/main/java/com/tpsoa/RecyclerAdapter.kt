@@ -77,8 +77,9 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
             playBtn.setOnClickListener {
                 if (mediaPlayer.isPlaying) {
                     mediaPlayer.pause()
-                } else {
                     playBtn.background = ContextCompat.getDrawable(context, R.drawable.ic_pause_btn)
+                } else {
+                    playBtn.background = ContextCompat.getDrawable(context, R.drawable.ic_play_btn)
 
                     seekBar.max = mediaPlayer.duration / 1000
                     runnable = Runnable {
