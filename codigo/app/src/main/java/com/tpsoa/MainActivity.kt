@@ -211,7 +211,6 @@ class MainActivity : BaseActivity() {
     private fun resumeRecording() {
         Toast.makeText(this, "Resuming voice note", Toast.LENGTH_SHORT).show()
         mediaRecorder.resume()
-        pauseResumeBtn.text = "Pause"
         isRecording = true
     }
 
@@ -220,7 +219,6 @@ class MainActivity : BaseActivity() {
         mediaRecorder.pause()
         mediaRecorder.pause()
         isRecording = false
-        pauseResumeBtn.text = "Resume"
     }
 
     private fun updateListView() {
