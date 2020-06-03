@@ -1,68 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_above="@+id/textView1"
+        android:layout_below="@+id/email_user_text"/>
+
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="5dp"
-        android:orientation="vertical">
+        android:id="@+id/textView1"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/email_user_text"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/pauseResumeBtn"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Hello!"
-            android:textSize="20sp" />
+            android:drawableStart="@android:drawable/ic_media_pause"
+            android:onClick="onPauseResumeClick"
+            android:text="@string/pause"
+            android:visibility="invisible" />
 
-        <ListView
-            android:id="@+id/listView"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/recordBtn"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="8" />
+            android:drawableStart="@android:drawable/presence_audio_online"
+            android:onClick="onRecordClick"
+            android:text="@string/record" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/stopBtn"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/pauseResumeBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:drawableStart="@android:drawable/ic_media_pause"
-                android:onClick="onPauseResumeClick"
-                android:text="@string/pause"
-                android:visibility="invisible" />
-
-            <Button
-                android:id="@+id/recordBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableStart="@android:drawable/presence_audio_online"
-                android:onClick="onRecordClick"
-                android:text="@string/record" />
-
-            <Button
-                android:id="@+id/stopBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:drawableStart="@android:drawable/checkbox_off_background"
-                android:onClick="onStopClick"
-                android:text="@string/stop"
-                android:visibility="invisible" />
-        </LinearLayout>
-
+            android:drawableStart="@android:drawable/checkbox_off_background"
+            android:onClick="onStopClick"
+            android:text="@string/stop"
+            android:visibility="invisible" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/email_user_text"
+        android:text="Hello!"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:gravity="center_vertical"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:textSize="20sp" />
+
 
 </RelativeLayout>
