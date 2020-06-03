@@ -6,19 +6,23 @@ import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorManager
-import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.tpsoa.common.GpsUtils
+import com.google.gson.Gson
+import com.tpsoa.model.VoiceNote
 import com.tpsoa.sharedpreferences.SharedPreferencesManager
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.pow
@@ -26,17 +30,23 @@ import kotlin.math.pow
 
 class MainActivity : BaseActivity() {
 
-    private var accelerometerSensor : Sensor ?= null
-    private val SHAKE_THRESHOLD: Float = 10.25f
+    private var accelerometerSensor: Sensor? = null
+    private val SHAKE_THRESHOLD: Float = 30.25f
     private val MIN_TIME_BETWEEN_SHAKES = 1000
     private var lastShakeTime: Long = 0
 
-    private var mediaRecorder: MediaRecorder? = null
-    private var mediaPlayer: MediaPlayer? = null
+    private lateinit var mediaRecorder: MediaRecorder
     private var audioFilePath: String? = null
     private var isRecording = false
 
-    private val formatter = SimpleDateFormat("dd-MM-yyyy hhmm")
+    private val formatter = SimpleDateFormat("dd-MM-yyyy HHmm")
+
+    private var recordedVoiceNotes: MutableSet<String>? = null
+
+    private var gson = Gson()
+
+    lateinit var mRecyclerView : RecyclerView
+    val mAdapter : RecyclerAdapter = RecyclerAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,15 +54,14 @@ class MainActivity : BaseActivity() {
 
         checkLogged()
 
+        recordedVoiceNotes = SharedPreferencesManager.getRecordedVoiceNotes()
+
         accelerometerSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         if (accelerometerSensor == null) {
             Toast.makeText(this, "Device has no accelerometer sensor", Toast.LENGTH_SHORT).show()
         }
 
-        GpsUtils.getLocation(this) { location ->
-            Log.d("got_location", location)
-        }
-
+        updateListView()
     }
 
     private fun checkLogged() {
@@ -103,11 +112,9 @@ class MainActivity : BaseActivity() {
             ) - SensorManager.GRAVITY_EARTH
             if (acceleration > SHAKE_THRESHOLD) {
                 lastShakeTime = curTime
-                Log.i("asd","isRecording: "+isRecording)
-                if(isRecording){
+                if (isRecording) {
                     stop()
-                }
-                else {
+                } else {
                     record()
                 }
             }
@@ -116,33 +123,41 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        sensorManager?.registerListener(this, this.accelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
+        sensorManager?.registerListener(
+            this,
+            this.accelerometerSensor,
+            SensorManager.SENSOR_DELAY_GAME
+        );
     }
 
     override fun onPause() {
         super.onPause()
-        sensorManager?.unregisterListener(this);
+        sensorManager?.unregisterListener(this)
     }
 
     fun onStopClick(view: View) {
         stop()
     }
 
-    private fun stop(){
-        stopBtn.isEnabled = false
-        pauseResumeBtn.isEnabled = true
+    private fun stop() {
+        stopBtn.visibility = View.INVISIBLE
+
+        pauseResumeBtn.visibility = View.INVISIBLE
 
         if (isRecording) {
-            mediaRecorder?.stop()
-            mediaRecorder?.release()
-            mediaRecorder = null
+            mediaRecorder.stop()
+            mediaRecorder.reset()
             isRecording = false
-        } else {
-            mediaPlayer?.release()
-            mediaPlayer = null
         }
-        recordBtn.isEnabled = true
-        Toast.makeText(this,"Saving "+audioFilePath, Toast.LENGTH_SHORT).show()
+        recordBtn.visibility = View.VISIBLE
+
+        GpsUtils.getLocation(this) { location ->
+            var v = audioFilePath?.let { VoiceNote(it, location) }
+            var json = gson.toJson(v)
+            recordedVoiceNotes?.add(json.toString())
+            SharedPreferencesManager.setRecordedVoiceNote(recordedVoiceNotes)
+            updateListView()
+        }
     }
 
     fun onRecordClick(view: View) {
@@ -156,54 +171,82 @@ class MainActivity : BaseActivity() {
     private fun hasRecordPermission(): Boolean {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
     }
-
-    private fun record(){
+    private fun record() {
         isRecording = true
-        stopBtn.isEnabled = true
-        recordBtn.isEnabled = false
-        pauseResumeBtn.isEnabled = true
+
+        stopBtn.visibility = View.VISIBLE
+
+        recordBtn.visibility = View.INVISIBLE
+
+        pauseResumeBtn.visibility = View.VISIBLE
+
+        mediaRecorder = MediaRecorder()
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT)
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT)
+
+        File(Environment.getExternalStorageDirectory().absolutePath + "/" + getString(R.string.app_name)).mkdir()
+
+        var currentDate = formatter.format(Date())
+        audioFilePath = Environment.getExternalStorageDirectory().absolutePath + "/" + getString(R.string.app_name) + "/voice note " + currentDate + ".mp3"
+        mediaRecorder.setOutputFile(audioFilePath)
+
         try {
-            mediaRecorder = MediaRecorder()
-            mediaRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
-            mediaRecorder?.setOutputFormat(
-                MediaRecorder.OutputFormat.DEFAULT)
-
-            var currentDate = formatter.format(Date())
-
-            audioFilePath = Environment.getExternalStorageDirectory().absolutePath + "/voice note "+currentDate+".mp3"
-            mediaRecorder?.setOutputFile(audioFilePath)
-            mediaRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT)
-            mediaRecorder?.prepare()
+            mediaRecorder.prepare()
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        mediaRecorder?.start()
-        Toast.makeText(this,"Recording "+audioFilePath, Toast.LENGTH_SHORT).show()
+        mediaRecorder.start()
+        Toast.makeText(this, "Recording " + audioFilePath, Toast.LENGTH_SHORT).show()
     }
 
     fun onPauseResumeClick(view: View) {
-        if(isRecording) {
+        if (isRecording) {
             pauseRecording()
-        }
-        else {
+        } else {
             resumeRecording()
         }
     }
 
     private fun resumeRecording() {
-        Toast.makeText(this,"Resuming voice note", Toast.LENGTH_SHORT).show()
-        mediaRecorder?.resume()
-        pauseResumeBtn.text = "Pause"
+        Toast.makeText(this, "Resuming voice note", Toast.LENGTH_SHORT).show()
+        mediaRecorder.resume()
         isRecording = true
     }
 
     private fun pauseRecording() {
-        Toast.makeText(this,"Voice note paused", Toast.LENGTH_SHORT).show()
-        mediaRecorder?.pause()
+        Toast.makeText(this, "Voice note paused", Toast.LENGTH_SHORT).show()
+        mediaRecorder.pause()
+        mediaRecorder.pause()
         isRecording = false
-        pauseResumeBtn.text = "Resume"
     }
 
+    private fun updateListView() {
+        var list = mutableListOf<VoiceNote>()
+
+        recordedVoiceNotes = SharedPreferencesManager.getRecordedVoiceNotes()
+        recordedVoiceNotes?.forEach { s ->
+            var v = gson.fromJson(s, VoiceNote::class.java)
+            list.add(v)
+        }
+
+        val emptyText = findViewById<View>(android.R.id.empty) as TextView
+
+        mRecyclerView = findViewById(R.id.voiceNotesList) as RecyclerView
+        mRecyclerView.setHasFixedSize(true)
+        mRecyclerView.layoutManager = LinearLayoutManager(this)
+        mAdapter.RecyclerAdapter(list, this)
+        mRecyclerView.adapter = mAdapter
+
+        if(list.isEmpty()){
+            mRecyclerView.visibility = View.GONE
+            emptyText.visibility = View.VISIBLE
+        }
+        else {
+            mRecyclerView.visibility = View.VISIBLE
+            emptyText.visibility = View.GONE
+        }
+    }
 }
 
 

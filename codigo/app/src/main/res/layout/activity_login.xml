@@ -21,7 +21,7 @@
                 android:id="@+id/user_text"
                 android:focusedByDefault="true"
                 android:layout_width="match_parent"
-                android:hint="Email address"
+                android:hint="@string/email_address"
                 android:padding="10dp"
                 android:ems="10"
                 android:layout_height="wrap_content">
@@ -30,7 +30,7 @@
             <EditText
                 android:id="@+id/password_text"
                 android:layout_width="match_parent"
-                android:hint="Password"
+                android:hint="@string/password"
                 android:padding="10dp"
                 android:layout_marginTop="10dp"
                 android:inputType="textPassword"
@@ -40,7 +40,7 @@
             <Button
                 android:id="@+id/login_btn"
                 android:layout_width="match_parent"
-                android:text="Sign in"
+                android:text="@string/sign_in"
                 android:enabled="false"
                 android:onClick="onLoginClick"
                 android:background="@drawable/login_btn_background"
@@ -53,7 +53,7 @@
             <TextView
                 android:id="@+id/sign_up_btn"
                 android:layout_width="wrap_content"
-                android:text="Sign Up"
+                android:text="@string/sign_up"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:onClick="onSignUpClick"

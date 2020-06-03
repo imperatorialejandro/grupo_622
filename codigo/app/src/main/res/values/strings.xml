@@ -4,4 +4,16 @@
     <string name="stop">Stop</string>
     <string name="pause">Pause</string>
     <string name="record">Record</string>
+    <string name="empty_list_view">"It seems you don't have any recording. Shake or press the record button to start a new one"</string>
+    <string name="email_address">Email address</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="name">Name</string>
+    <string name="lastname">LastName</string>
+    <string name="dni">DNI</string>
+    <string name="group">Group</string>
+    <string name="commission">Commission</string>
+    <string name="already_have_an_account">I already have an account</string>
+    <string name="confirm_password">Confirm Password</string>
 </resources>

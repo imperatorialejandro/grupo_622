@@ -74,7 +74,7 @@ open class BaseActivity : AppCompatActivity(), SensorEventListener {
             val mode: Int = AppCompatDelegate.getDefaultNightMode()
             if (value < 100 && mode != AppCompatDelegate.MODE_NIGHT_YES) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else if (value > 1000 && mode != AppCompatDelegate.MODE_NIGHT_NO) {
+            } else if (value > 500 && mode != AppCompatDelegate.MODE_NIGHT_NO) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
         } else if (event!!.sensor.type == Sensor.TYPE_ACCELEROMETER) {

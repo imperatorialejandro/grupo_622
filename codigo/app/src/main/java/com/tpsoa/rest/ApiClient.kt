@@ -16,7 +16,6 @@ object ApiConstants {
     const val CONTENT_TYPE_HEADER = "Content-Type:application/json"
 }
 
-
 interface ApiInterface {
     @Headers(ApiConstants.CONTENT_TYPE_HEADER)
     @POST("login")

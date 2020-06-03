@@ -2,4 +2,5 @@
 <resources>
 <!-- Custom Light colors -->
     <color name="colorAccent">#FF4081</color>
+    <color name="colorPlay">#6CEDDA</color>
 </resources>
