@@ -49,7 +49,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/playBtn"
+        android:id="@+id/playItemBtn"
         android:layout_height="40dp"
         android:layout_width="30dp"
         android:layout_weight="0"
@@ -57,7 +57,7 @@
         android:background="@drawable/ic_play_btn"/>
 
     <Button
-        android:id="@+id/pauseBtn"
+        android:id="@+id/pauseItemBtn"
         android:layout_height="40dp"
         android:layout_width="30dp"
         android:layout_weight="0"

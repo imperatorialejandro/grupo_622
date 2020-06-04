@@ -27,6 +27,8 @@ open class BaseActivity : AppCompatActivity(), SensorEventListener {
     var sensorManager: SensorManager? = null
     private var lightSensor: Sensor? = null
 
+    var isRecording: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -38,6 +40,8 @@ open class BaseActivity : AppCompatActivity(), SensorEventListener {
         }
 
         checkLocationPermission()
+        checkStoragePermission()
+        checkRecordPermission()
     }
 
     private fun checkLocationPermission() {
@@ -49,10 +53,48 @@ open class BaseActivity : AppCompatActivity(), SensorEventListener {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            ActivityCompat.requestPermissions(this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION),
-            1000)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                1000
+            )
+        }
+    }
+
+    private fun checkStoragePermission() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ),
+                1000
+            )
+        }
+    }
+
+    private fun checkRecordPermission() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.RECORD_AUDIO
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.RECORD_AUDIO),
+                1000
+            )
         }
     }
 
@@ -70,6 +112,10 @@ open class BaseActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event!!.sensor.type == Sensor.TYPE_LIGHT) {
+            if (isRecording) {
+                return
+            }
+            
             val value: Float = event.values[0]
             val mode: Int = AppCompatDelegate.getDefaultNightMode()
             if (value < 100 && mode != AppCompatDelegate.MODE_NIGHT_YES) {
@@ -90,7 +136,7 @@ open class BaseActivity : AppCompatActivity(), SensorEventListener {
 
         call.enqueue(object : Callback<EventResponse> {
             override fun onResponse(call: Call<EventResponse>, response: Response<EventResponse>) {
-                if (response.isSuccessful){
+                if (response.isSuccessful) {
                     val res = response.body() as EventResponse
                     Log.i("Event registered", res.event.type)
                 } else {
@@ -98,6 +144,7 @@ open class BaseActivity : AppCompatActivity(), SensorEventListener {
                     Log.e("Error registering event", errorBody.get("msg").toString())
                 }
             }
+
             override fun onFailure(call: Call<EventResponse>, t: Throwable) {
                 Log.e("Error registering event", t.message)
             }

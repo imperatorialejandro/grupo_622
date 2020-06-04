@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.tpsoa.common.GpsUtils
 import com.google.gson.Gson
 import com.tpsoa.model.EventRequest
@@ -38,16 +39,16 @@ class MainActivity : BaseActivity() {
 
     private lateinit var mediaRecorder: MediaRecorder
     private var audioFilePath: String? = null
-    private var isRecording = false
 
-    private val formatter = SimpleDateFormat("dd-MM-yyyy HHmm")
+    private val formatter = SimpleDateFormat("EEE dd MMMM yyyy, HHmmss")
 
     private var recordedVoiceNotes: MutableSet<String>? = null
 
     private var gson = Gson()
 
-    lateinit var mRecyclerView : RecyclerView
-    val mAdapter : RecyclerAdapter = RecyclerAdapter()
+    private lateinit var recyclerView: RecyclerView
+    private val adapter: RecyclerAdapter = RecyclerAdapter()
+    private lateinit var outputDirectory: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +63,7 @@ class MainActivity : BaseActivity() {
             Toast.makeText(this, "Device has no accelerometer sensor", Toast.LENGTH_SHORT).show()
         }
 
+        setupMediaRecorder()
         updateListView()
     }
 
@@ -142,7 +144,9 @@ class MainActivity : BaseActivity() {
 
     private fun stop() {
         stopBtn.visibility = View.GONE
-        pauseResumeBtn.visibility = View.GONE
+        pauseBtn.visibility = View.GONE
+        resumeBtn.visibility = View.GONE
+        opacityFilter.visibility = View.GONE
 
         if (isRecording) {
             mediaRecorder.stop()
@@ -163,7 +167,8 @@ class MainActivity : BaseActivity() {
     }
 
     private fun registerNewStopRecordEvent(location: String) {
-        var event = EventRequest("NEW_VOICE_NOTE", "ACTIVO", "New voice note recorded near $location")
+        var event =
+            EventRequest("NEW_VOICE_NOTE", "ACTIVO", "New voice note recorded near $location")
         registerEvent(event)
     }
 
@@ -176,7 +181,19 @@ class MainActivity : BaseActivity() {
     }
 
     private fun hasRecordPermission(): Boolean {
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+        return ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun setupMediaRecorder() {
+        outputDirectory = this.getExternalFilesDir(null)?.absolutePath + "/" + getString(R.string.app_name) + "/"
+        File(outputDirectory).mkdir()
+        mediaRecorder = MediaRecorder()
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT)
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT)
     }
 
     private fun record() {
@@ -184,27 +201,30 @@ class MainActivity : BaseActivity() {
 
         stopBtn.visibility = View.VISIBLE
         recordBtn.visibility = View.GONE
-        pauseResumeBtn.visibility = View.VISIBLE
-
-        mediaRecorder = MediaRecorder()
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT)
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT)
-
-        File(Environment.getExternalStorageDirectory().absolutePath + "/" + getString(R.string.app_name)).mkdir()
+        pauseBtn.visibility = View.VISIBLE
 
         var currentDate = formatter.format(Date())
-        audioFilePath = Environment.getExternalStorageDirectory().absolutePath + "/" + getString(R.string.app_name) + "/voice note " + currentDate + ".mp3"
+        audioFilePath = "$outputDirectory$currentDate.mp3"
         mediaRecorder.setOutputFile(audioFilePath)
 
         try {
             mediaRecorder.prepare()
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "An error occurred while saving the voice note", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                "An error occurred while saving the voice note",
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
         mediaRecorder.start()
+
+        opacityFilter.visibility = View.VISIBLE
+
+        Glide.with(this)
+            .load(R.drawable.recording)
+            .into(imageView)
 
         registerNewStartRecordEvent()
     }
@@ -214,25 +234,30 @@ class MainActivity : BaseActivity() {
         registerEvent(event)
     }
 
-    fun onPauseResumeClick(view: View) {
-        if (isRecording) {
-            pauseRecording()
-        } else {
-            resumeRecording()
-        }
-    }
-
-    private fun resumeRecording() {
+    fun onResumeClick(view: View) {
         mediaRecorder.resume()
+        resumeBtn.visibility = View.GONE
+        pauseBtn.visibility = View.VISIBLE
         isRecording = true
     }
 
-    private fun pauseRecording() {
+    fun onPauseClick(view: View) {
         mediaRecorder.pause()
+        pauseBtn.visibility = View.GONE
+        resumeBtn.visibility = View.VISIBLE
         isRecording = false
     }
 
     private fun updateListView() {
+        if (!hasReadStoragePermission()) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                10
+            )
+            return
+        }
+
         var list = mutableListOf<VoiceNote>()
 
         recordedVoiceNotes = SharedPreferencesManager.getRecordedVoiceNotes()
@@ -243,22 +268,27 @@ class MainActivity : BaseActivity() {
 
         val emptyText = findViewById<View>(android.R.id.empty) as TextView
 
-        mRecyclerView = findViewById(R.id.voiceNotesList) as RecyclerView
-        mRecyclerView.setHasFixedSize(true)
-        mRecyclerView.layoutManager = LinearLayoutManager(this)
-        mAdapter.RecyclerAdapter(list, this)
-        mRecyclerView.adapter = mAdapter
+        recyclerView = findViewById(R.id.voiceNotesList) as RecyclerView
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        adapter.RecyclerAdapter(list, this)
+        recyclerView.adapter = adapter
 
-        if(list.isEmpty()){
-            mRecyclerView.visibility = View.GONE
+        if (list.isEmpty()) {
+            recyclerView.visibility = View.GONE
             emptyText.visibility = View.VISIBLE
-        }
-        else {
-            mRecyclerView.visibility = View.VISIBLE
+        } else {
+            recyclerView.visibility = View.VISIBLE
             emptyText.visibility = View.GONE
         }
     }
 
+    private fun hasReadStoragePermission(): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+    }
 }
 
 
