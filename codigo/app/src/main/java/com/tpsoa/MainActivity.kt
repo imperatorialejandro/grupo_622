@@ -39,7 +39,6 @@ class MainActivity : BaseActivity() {
 
     private lateinit var mediaRecorder: MediaRecorder
     private var audioFilePath: String? = null
-    private var isRecording = false
 
     private val formatter = SimpleDateFormat("EEE dd MMMM yyyy, HHmmss")
 
@@ -49,6 +48,7 @@ class MainActivity : BaseActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private val adapter: RecyclerAdapter = RecyclerAdapter()
+    private lateinit var outputDirectory: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +63,7 @@ class MainActivity : BaseActivity() {
             Toast.makeText(this, "Device has no accelerometer sensor", Toast.LENGTH_SHORT).show()
         }
 
+        setupMediaRecorder()
         updateListView()
     }
 
@@ -137,11 +138,6 @@ class MainActivity : BaseActivity() {
         sensorManager?.unregisterListener(this)
     }
 
-    override fun onRestart() {
-        super.onRestart()
-        recreate()
-    }
-
     fun onStopClick(view: View) {
         stop()
     }
@@ -191,6 +187,15 @@ class MainActivity : BaseActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    private fun setupMediaRecorder() {
+        outputDirectory = this.getExternalFilesDir(null)?.absolutePath + "/" + getString(R.string.app_name) + "/"
+        File(outputDirectory).mkdir()
+        mediaRecorder = MediaRecorder()
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT)
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT)
+    }
+
     private fun record() {
         isRecording = true
 
@@ -198,16 +203,8 @@ class MainActivity : BaseActivity() {
         recordBtn.visibility = View.GONE
         pauseBtn.visibility = View.VISIBLE
 
-        mediaRecorder = MediaRecorder()
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT)
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT)
-
-        File(Environment.getExternalStorageDirectory().absolutePath + "/" + getString(R.string.app_name)).mkdir()
-
         var currentDate = formatter.format(Date())
-        audioFilePath =
-            Environment.getExternalStorageDirectory().absolutePath + "/" + getString(R.string.app_name) + "/" + currentDate + ".mp3"
+        audioFilePath = "$outputDirectory$currentDate.mp3"
         mediaRecorder.setOutputFile(audioFilePath)
 
         try {
