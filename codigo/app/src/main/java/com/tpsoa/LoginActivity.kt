@@ -105,7 +105,7 @@ class LoginActivity : BaseActivity() {
 
     private fun registerLoginEvent() {
         var userLogged = SharedPreferencesManager.getUserLogged()
-        var event = EventRequest("Login", "ACTIVO", "User $userLogged logged")
+        var event = EventRequest("LOGIN", "ACTIVO", "User $userLogged logged")
         registerEvent(event)
     }
 

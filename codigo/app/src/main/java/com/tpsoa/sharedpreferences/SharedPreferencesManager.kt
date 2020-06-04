@@ -36,7 +36,7 @@ object SharedPreferencesManager {
         editor.commit()
     }
 
-    fun clearPrefs() {
+    fun clearCurrentUserPrefs() {
         setToken("")
         setUserLogged("")
     }

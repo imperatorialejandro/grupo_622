@@ -19,10 +19,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tpsoa.common.GpsUtils
 import com.google.gson.Gson
+import com.tpsoa.model.EventRequest
 import com.tpsoa.model.VoiceNote
 import com.tpsoa.sharedpreferences.SharedPreferencesManager
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.item.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -95,7 +95,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun onLogoutClick() {
-        SharedPreferencesManager.clearPrefs()
+        SharedPreferencesManager.clearCurrentUserPrefs()
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
     }
@@ -141,9 +141,8 @@ class MainActivity : BaseActivity() {
     }
 
     private fun stop() {
-        stopBtn.visibility = View.INVISIBLE
-
-        pauseResumeBtn.visibility = View.INVISIBLE
+        stopBtn.visibility = View.GONE
+        pauseResumeBtn.visibility = View.GONE
 
         if (isRecording) {
             mediaRecorder.stop()
@@ -158,7 +157,14 @@ class MainActivity : BaseActivity() {
             recordedVoiceNotes?.add(json.toString())
             SharedPreferencesManager.setRecordedVoiceNote(recordedVoiceNotes)
             updateListView()
+
+            registerNewStopRecordEvent(location)
         }
+    }
+
+    private fun registerNewStopRecordEvent(location: String) {
+        var event = EventRequest("NEW_VOICE_NOTE", "ACTIVO", "New voice note recorded near $location")
+        registerEvent(event)
     }
 
     fun onRecordClick(view: View) {
@@ -177,9 +183,7 @@ class MainActivity : BaseActivity() {
         isRecording = true
 
         stopBtn.visibility = View.VISIBLE
-
-        recordBtn.visibility = View.INVISIBLE
-
+        recordBtn.visibility = View.GONE
         pauseResumeBtn.visibility = View.VISIBLE
 
         mediaRecorder = MediaRecorder()
@@ -197,9 +201,17 @@ class MainActivity : BaseActivity() {
             mediaRecorder.prepare()
         } catch (e: Exception) {
             e.printStackTrace()
+            Toast.makeText(this, "An error occurred while saving the voice note", Toast.LENGTH_SHORT).show()
         }
+
         mediaRecorder.start()
-        Toast.makeText(this, "Recording " + audioFilePath, Toast.LENGTH_SHORT).show()
+
+        registerNewStartRecordEvent()
+    }
+
+    private fun registerNewStartRecordEvent() {
+        var event = EventRequest("RECORDING_NEW_VOICE_NOTE", "ACTIVO", "Recording new voice note")
+        registerEvent(event)
     }
 
     fun onPauseResumeClick(view: View) {
@@ -211,14 +223,11 @@ class MainActivity : BaseActivity() {
     }
 
     private fun resumeRecording() {
-        Toast.makeText(this, "Resuming voice note", Toast.LENGTH_SHORT).show()
         mediaRecorder.resume()
         isRecording = true
     }
 
     private fun pauseRecording() {
-        Toast.makeText(this, "Voice note paused", Toast.LENGTH_SHORT).show()
-        mediaRecorder.pause()
         mediaRecorder.pause()
         isRecording = false
     }
@@ -249,6 +258,7 @@ class MainActivity : BaseActivity() {
             emptyText.visibility = View.GONE
         }
     }
+
 }
 
 
