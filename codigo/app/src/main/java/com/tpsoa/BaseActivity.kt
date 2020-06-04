@@ -38,6 +38,8 @@ open class BaseActivity : AppCompatActivity(), SensorEventListener {
         }
 
         checkLocationPermission()
+        checkStoragePermission()
+        checkRecordPermission()
     }
 
     private fun checkLocationPermission() {
@@ -53,6 +55,33 @@ open class BaseActivity : AppCompatActivity(), SensorEventListener {
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION),
             1000)
+        }
+    }
+
+    private fun checkStoragePermission() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE),
+                1000)
+        }
+    }
+
+    private fun checkRecordPermission() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.RECORD_AUDIO
+            ) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.RECORD_AUDIO),
+                1000)
         }
     }
 

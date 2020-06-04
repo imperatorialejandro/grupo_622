@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.tpsoa.model.VoiceNote
 import java.io.File
@@ -45,8 +44,8 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
         val durationTextView = view.findViewById(R.id.duration) as TextView
         val locationTextView = view.findViewById(R.id.location) as TextView
         val timeTextView = view.findViewById(R.id.time) as TextView
-        val playBtn = view.findViewById(R.id.playBtn) as Button
-        val pauseBtn = view.findViewById(R.id.pauseBtn) as Button
+        val playBtn = view.findViewById(R.id.playItemBtn) as Button
+        val pauseBtn = view.findViewById(R.id.pauseItemBtn) as Button
         val seekBar = view.findViewById(R.id.seekBar) as SeekBar
 
         private lateinit var runnable: Runnable
@@ -92,9 +91,9 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
                     )
                     timeTextView.text = current
 
-                    handler.postDelayed(runnable, 1000)
+                    handler.postDelayed(runnable, 1)
                 }
-                handler.postDelayed(runnable, 1000)
+                handler.postDelayed(runnable, 1)
 
                 mediaPlayer.start()
             }
