@@ -2,19 +2,16 @@ package com.tpsoa
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorManager
 import android.media.MediaRecorder
 import android.os.Bundle
-import android.os.Environment
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -62,7 +59,13 @@ class MainActivity : BaseActivity() {
         if (accelerometerSensor == null) {
             Toast.makeText(this, "Device has no accelerometer sensor", Toast.LENGTH_SHORT).show()
         }
+        if (checkPermissions(PERMISSIONS)) {
+            init()
+        }
+    }
 
+    override fun init() {
+        super.init()
         setupMediaRecorder()
         updateListView()
     }
@@ -173,22 +176,28 @@ class MainActivity : BaseActivity() {
     }
 
     fun onRecordClick(view: View) {
-        if (!hasRecordPermission()) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 10)
+        if(!checkPermissions(arrayOf(
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.RECORD_AUDIO
+        ))){
             return
         }
+
         record()
     }
 
-    private fun hasRecordPermission(): Boolean {
-        return ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.RECORD_AUDIO
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
     private fun setupMediaRecorder() {
-        outputDirectory = this.getExternalFilesDir(null)?.absolutePath + "/" + getString(R.string.app_name) + "/"
+        if(!checkPermissions(arrayOf(
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.RECORD_AUDIO
+        ))){
+            return
+        }
+
+        outputDirectory =
+            this.getExternalFilesDir(null)?.absolutePath + "/" + getString(R.string.app_name) + "/"
         File(outputDirectory).mkdir()
         mediaRecorder = MediaRecorder()
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
@@ -249,12 +258,10 @@ class MainActivity : BaseActivity() {
     }
 
     private fun updateListView() {
-        if (!hasReadStoragePermission()) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                10
-            )
+        if(!checkPermissions(arrayOf(
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ))){
             return
         }
 
@@ -281,13 +288,6 @@ class MainActivity : BaseActivity() {
             recyclerView.visibility = View.VISIBLE
             emptyText.visibility = View.GONE
         }
-    }
-
-    private fun hasReadStoragePermission(): Boolean {
-        return ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
     }
 }
 
