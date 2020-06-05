@@ -28,7 +28,7 @@ android {
         }
 
         buildTypes.each {
-            it.buildConfigField "String", "API_ENV", "\"TEST\""
+            it.buildConfigField "String", "API_ENV", "\"DEV\""
         }
     }
 
