@@ -212,6 +212,8 @@ class MainActivity : BaseActivity() {
         recordBtn.visibility = View.GONE
         pauseBtn.visibility = View.VISIBLE
 
+        setupMediaRecorder()
+
         var currentDate = formatter.format(Date())
         audioFilePath = "$outputDirectory$currentDate.mp3"
         mediaRecorder.setOutputFile(audioFilePath)
@@ -225,6 +227,7 @@ class MainActivity : BaseActivity() {
                 "An error occurred while saving the voice note",
                 Toast.LENGTH_SHORT
             ).show()
+            return
         }
 
         mediaRecorder.start()
